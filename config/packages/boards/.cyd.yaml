@@ -1,0 +1,87 @@
+# Cheap Yellow Display
+packages:
+  base: !include ../common/.base.yaml
+
+esp32:
+  board: esp32dev
+
+light:
+  # Backlight
+  - platform: monochromatic
+    output: backlight_pwm
+    name: Display Backlight
+    id: backlight
+    restore_mode: ALWAYS_ON
+  # Set up the LED on the back 
+  - platform: rgb
+    name: LED
+    id: led
+    red: output_red
+    green: output_green
+    blue: output_blue
+    restore_mode: ALWAYS_OFF
+
+# Configuration of the SPI bus for the display and touchscreen
+# The ESP32-2432S028R uses separate SPI buses for display and touch
+spi:
+  - id: tft
+    clk_pin: GPIO14
+    mosi_pin: GPIO13
+    miso_pin: GPIO12
+  - id: touch
+    clk_pin: GPIO25
+    mosi_pin: GPIO32
+    miso_pin: GPIO39
+
+output:
+  - platform: ledc
+    pin: GPIO21
+    id: backlight_pwm
+  - platform: ledc
+    id: output_red
+    pin: GPIO4
+    inverted: true
+  - platform: ledc
+    id: output_green
+    pin: GPIO16
+    inverted: true
+  - platform: ledc
+    id: output_blue
+    pin: GPIO17
+    inverted: true
+
+# Display is used as 240x320 by default so we rotate it to 0°
+display:
+  - platform: ili9xxx
+    model: ILI9341
+    id: yellow_screen
+    spi_id: tft
+    cs_pin: GPIO15
+    dc_pin: GPIO2
+    rotation: 0
+    dimensions:
+      height: 240
+      width: 320
+    invert_colors: false
+    auto_clear_enabled: false
+    update_interval: never
+    # ATTENTION: Only if you see shifted colors, change from bgr to rgb
+    color_order: rgb
+
+touchscreen:
+  - platform: xpt2046
+    id: yellow_touchscreen
+    spi_id: touch
+    cs_pin: GPIO33
+    interrupt_pin: GPIO36
+    update_interval: 50ms
+    threshold: 400
+    calibration:
+      x_min: 300
+      x_max: 3900
+      y_min: 200
+      y_max: 3700
+    transform:
+      swap_xy: true
+      mirror_x: true
+      mirror_y: true

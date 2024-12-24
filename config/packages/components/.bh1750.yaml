@@ -1,0 +1,12 @@
+i2c:
+  - id: i2c_bh1750
+    sda: ${i2c_sda}
+    scl: ${i2c_scl}
+    scan: true
+
+sensor:
+  - platform: bh1750
+    i2c_id: i2c_bh1750
+    name: "BH1750 Illuminance"
+    address: ${i2c_address}
+    update_interval: ${update_interval}

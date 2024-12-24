@@ -1,0 +1,12 @@
+substitutions:
+
+packages:
+  device: !include {
+    file: packages/devices/.powerpal-gateway.yaml,
+    vars: {
+      device_name: powerpal-gateway,
+      device_friendly_name: powerpal-gateway,
+      ble_client_mac_address: !secret powerpal_ble_client_mac_address,
+      ble_pairing_code: !secret powerpal_ble_pairing_code
+    }
+  }

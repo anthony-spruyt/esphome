@@ -1,0 +1,31 @@
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+sensor:
+  - platform: wifi_signal
+    name: "RSSI"
+    id: sensor_rssi
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      id: wifi_ip_address
+      name: "IP Address"
+      icon: "mdi:wan"
+      entity_category: "diagnostic"
+    bssid:
+      id: wifi_bssid
+      name: "BSSID"
+      icon: "mdi:wan"
+      entity_category: "diagnostic"

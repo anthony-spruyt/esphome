@@ -1,0 +1,382 @@
+packages:
+  board: !include ../boards/.cyd.yaml
+
+esp32:
+  framework: 
+    type: esp-idf
+
+#esphome:
+#  on_boot:
+#    - delay: 5s
+#    - lvgl.widget.hide: boot_screen
+
+api:
+  on_client_connected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        # Show connected client status
+        then:
+          - lvgl.widget.show: lbl_hastatus
+  on_client_disconnected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        # Hide client status
+        then:
+          - lvgl.widget.hide: lbl_hastatus
+
+image:
+  #- file: https://esphome.io/_static/favicon-512x512.png
+  #  id: boot_logo
+  #  resize: 200x200
+  #  type: RGB565
+  #  # Use transparency for light background
+  #  use_transparency: true
+  - file: mdi:transmission-tower-export
+    id: transmission_tower_export_icon
+    resize: 30x30
+  - file: mdi:transmission-tower-import
+    id: transmission_tower_import_icon
+    resize: 30x30
+  - file: mdi:home
+    id: home_icon
+    resize: 30x30
+  - file: mdi:solar-power
+    id: solar_power_icon
+    resize: 30x30
+
+lvgl:
+  # Buffer size for rendering (DO NOT CHANGE OTHERWISE IT CRASHES DUE TO PSRAM SHORTAGE)
+  buffer_size: 0.6
+  displays:
+    - yellow_screen
+  theme:
+    label:
+      text_font: montserrat_16
+    button:
+      bg_color: 0x2F8CD8
+      bg_grad_color: 0x005782
+      bg_grad_dir: VER
+      bg_opa: COVER
+      border_color: 0x0077b3
+      border_width: 1
+      text_color: 0xFFFFFF
+      pressed:
+        bg_color: 0x006699
+        bg_grad_color: 0x00334d
+      checked:
+        bg_color: 0x1d5f96
+        bg_grad_color: 0x03324A
+        text_color: 0xfff300
+    buttonmatrix:
+      bg_opa: TRANSP
+      border_color: 0x0077b3
+      border_width: 0
+      text_color: 0xFFFFFF
+      pad_all: 0
+      items:
+        bg_color: 0x2F8CD8
+        bg_grad_color: 0x005782
+        bg_grad_dir: VER
+        bg_opa: COVER
+        border_color: 0x0077b3
+        border_width: 1
+        text_color: 0xFFFFFF
+        text_font: montserrat_16
+        pressed:
+          bg_color: 0x006699
+          bg_grad_color: 0x00334d
+        checked:
+          bg_color: 0x1d5f96
+          bg_grad_color: 0x03324A
+          text_color: 0x005580
+    switch:
+      bg_color: 0xC0C0C0
+      bg_grad_color: 0xb0b0b0
+      bg_grad_dir: VER
+      bg_opa: COVER
+      checked:
+        bg_color: 0x1d5f96
+        bg_grad_color: 0x03324A
+      knob:
+        bg_color: 0xFFFFFF
+        bg_grad_color: 0xC0C0C0
+        bg_grad_dir: VER
+        bg_opa: COVER
+    slider:
+      border_width: 1
+      border_opa: 15%
+      bg_color: 0xcccaca
+      bg_opa: 15%
+      indicator:
+        bg_color: 0x1d5f96
+        bg_grad_color: 0x03324A
+        bg_grad_dir: VER
+        bg_opa: COVER
+      knob:
+        bg_color: 0x2F8CD8
+        bg_grad_color: 0x005782
+        bg_grad_dir: VER
+        bg_opa: COVER
+        border_color: 0x0077b3
+        border_width: 1
+        text_color: 0xFFFFFF
+  style_definitions:
+    - id: orange_icon_style
+      #text_color: orange
+      #bg_color: orange
+      #border_color: orange
+      #arc_color: orange
+    - id: blue_icon_style
+      #text_color: blue
+      #bg_color: blue
+      #arc_color: blue
+      #border_color: blue
+    - id: red_icon_style
+      #text_color: red
+      #bg_color: red
+      #border_color: red
+      #arc_color: red
+    - id: purple_icon_style
+      #text_color: purple
+      #bg_color: purple
+      #border_color: purple
+      #arc_color: purple
+    - id: header_footer
+      bg_color: 0x2F8CD8
+      bg_grad_color: 0x005782
+      bg_grad_dir: VER
+      bg_opa: COVER
+      border_opa: TRANSP
+      radius: 0
+      pad_all: 0
+      pad_row: 0
+      pad_column: 0
+      border_color: 0x0077b3
+      text_color: 0xFFFFFF
+      width: 100%
+      height: 30
+  top_layer:
+    widgets:
+      # Navigation menu at the bottom of the screen
+      - buttonmatrix:
+          align: bottom_mid
+          styles: header_footer
+          pad_all: 0
+          outline_width: 0
+          id: top_layer
+          items:
+            styles: header_footer
+          rows:
+            - buttons:
+              - id: page_prev
+                text: "\uF053"
+                on_press:
+                  then:
+                    lvgl.page.previous:
+              - id: page_home
+                text: "\uF015"
+                on_press:
+                  then:
+                    lvgl.page.show: active_power_page
+              - id: page_next
+                text: "\uF054"
+                on_press:
+                  then:
+                    lvgl.page.next:
+      # Connectivity status icon
+      - label:
+          text: "\uF1EB"
+          id: lbl_hastatus
+          hidden: true
+          align: bottom_mid
+          x: -30
+          y: -8
+          text_align: center
+          text_color: 0xFFFFFF
+  pages:
+    - id: active_power_page
+      widgets:
+        # Generation (Top Left)
+        - label:
+            text: "Solar"
+            x: 10
+            y: 10
+            text_color: orange
+            text_font: montserrat_20
+        - label:
+            id: generation_value
+            text: ".... W"
+            x: 10
+            y: 40
+            text_font: montserrat_16
+        - image:
+            id: generation_image
+            src: solar_power_icon
+            x: 120
+            y: 10
+            styles:
+              - orange_icon_style
+        - bar:
+            id: generation_bar
+            x: 10
+            y: 70
+            width: 140
+            height: 20
+            min_value: 0
+            max_value: 5000
+            bg_color: orange
+        # Export (Top Right)
+        - label:
+            text: "Export"
+            x: 170
+            y: 10
+            text_color: purple
+            text_font: montserrat_20
+        - label:
+            id: export_value
+            text: ".... W"
+            x: 170
+            y: 40
+            text_font: montserrat_16
+        - image:
+            id: export_image
+            src: transmission_tower_import_icon
+            x: 280
+            y: 10
+            styles:
+              - purple_icon_style
+        - bar:
+            id: export_bar
+            x: 170
+            y: 70
+            width: 140
+            height: 20
+            min_value: 0
+            max_value: 5000
+            bg_color: purple
+        # Consumption (Bottom Left)
+        - label:
+            text: "Home"
+            x: 10
+            y: 110
+            text_color: red
+            text_font: montserrat_20
+        - label:
+            id: consumption_value
+            text: ".... W"
+            x: 10
+            y: 140
+            text_font: montserrat_16
+        - image:
+            id: consumption_image
+            src: home_icon
+            x: 120
+            y: 110
+            styles:
+              - red_icon_style
+        - bar:
+            id: consumption_bar
+            x: 10
+            y: 170
+            width: 140
+            height: 20
+            min_value: 0
+            max_value: 5000
+            bg_color: red
+        # Import (Bottom Right)
+        - label:
+            text: "Import"
+            x: 170
+            y: 110
+            text_color: blue
+            text_font: montserrat_20
+        - label:
+            id: import_value
+            text: ".... W"
+            x: 170
+            y: 140
+            text_font: montserrat_16
+        - image:
+            id: import_image
+            src: transmission_tower_export_icon
+            x: 280
+            y: 110
+            styles:
+              - blue_icon_style
+        - bar:
+            id: import_bar
+            x: 170
+            y: 170
+            width: 140
+            height: 20
+            min_value: 0
+            max_value: 5000
+            bg_color: blue
+    - id: hello_page
+      widgets:
+        - label:
+            text: "HELLO"
+            x: 10
+            y: 10
+            text_color: orange
+            text_font: montserrat_20
+
+sensor:
+  - platform: homeassistant
+    id: sensor_generation
+    entity_id: ${sensor_generation}
+    on_value:
+      - lvgl.label.update:
+          id: generation_value
+          text: !lambda |-
+            char buffer[16];
+            snprintf(buffer, sizeof(buffer), "%d W", (int)id(sensor_generation).state);
+            return std::string(buffer).c_str();
+      - lvgl.bar.update:
+          id: generation_bar
+          value: !lambda |-
+            return (int)id(sensor_generation).state;
+  - platform: homeassistant
+    id: sensor_export
+    entity_id: ${sensor_export}
+    on_value:
+      - lvgl.label.update:
+          id: export_value
+          text: !lambda |-
+            char buffer[16];
+            snprintf(buffer, sizeof(buffer), "%d W", (int)id(sensor_export).state);
+            return std::string(buffer).c_str();
+      - lvgl.bar.update:
+          id: export_bar
+          value: !lambda |-
+            return (int)id(sensor_export).state;
+  - platform: homeassistant
+    id: sensor_consumption
+    entity_id: ${sensor_consumption}
+    on_value:
+      - lvgl.label.update:
+          id: consumption_value
+          text: !lambda |-
+            char buffer[16];
+            snprintf(buffer, sizeof(buffer), "%d W", (int)id(sensor_consumption).state);
+            return std::string(buffer).c_str();
+      - lvgl.bar.update:
+          id: consumption_bar
+          value: !lambda |-
+            return (int)id(sensor_consumption).state;
+  - platform: homeassistant
+    id: sensor_import
+    entity_id: ${sensor_import}
+    on_value:
+      - lvgl.label.update:
+          id: import_value
+          text: !lambda |-
+            char buffer[16];
+            snprintf(buffer, sizeof(buffer), "%d W", (int)id(sensor_import).state);
+            return std::string(buffer).c_str();
+      - lvgl.bar.update:
+          id: import_bar
+          value: !lambda |-
+            return (int)id(sensor_import).state;

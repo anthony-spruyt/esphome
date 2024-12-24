@@ -1,0 +1,49 @@
+packages:
+  board: !include ../boards/.m5stack-atom-lite.yaml
+
+esp32:
+  framework: 
+    type: arduino
+
+external_components:
+  - source:
+      type: local
+      path: custom_components
+    components: [powerpal_ble, http_request]
+
+# optional requirement to enable powerpal cloud uploading
+http_request:
+  id: powerpal_cloud_uploader
+
+# optional requirement used with daily energy sensor
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+esp32_ble_tracker:
+
+ble_client:
+  - mac_address: ${ble_client_mac_address}
+    id: powerpal
+
+sensor:
+  - platform: powerpal_ble
+    ble_client_id: powerpal
+    power:
+      name: "Powerpal Power"
+      accuracy_decimals: 0
+    daily_energy:
+      name: "Powerpal Daily Energy"
+    energy:
+      name: "Powerpal Total Energy"
+      accuracy_decimals: 3
+    battery_level:
+      name: "Powerpal Battery"
+    pairing_code: ${ble_pairing_code}
+    notification_interval: 1 # get updates every 1 minute
+    pulses_per_kwh: 1000
+    time_id: homeassistant_time # daily energy still works without a time_id, but recommended to include one to properly handle daylight savings, etc.
+#    http_request_id: powerpal_cloud_uploader
+#    cost_per_kwh: 0.20 #dollars per kWh
+#    powerpal_device_id: 0000abcd #optional, component will retrieve from your Powerpal if not set
+#    powerpal_apikey: 4a89e298-b17b-43e7-a0c1-fcd1412e98ef #optional, component will retrieve from your Powerpal if not set

@@ -1,0 +1,24 @@
+i2c:
+  - id: i2c_aht20_bmp280
+    sda: ${i2c_sda}
+    scl: ${i2c_scl}
+    scan: true
+  
+sensor:
+  - platform: aht10
+    variant: AHT20
+    i2c_id: i2c_aht20_bmp280
+    address: ${aht20_address}
+    temperature:
+      name: "AHT20 Temperature"
+    humidity:
+      name: "AHT20 Humidity"
+    update_interval: ${update_interval}
+  - platform: bmp280_i2c
+    i2c_id: i2c_aht20_bmp280
+    address: ${bmp280_address}
+    temperature:
+      name: "BMP280 Temperature"
+    pressure:
+      name: "BMP280 Pressure"
+    update_interval: ${update_interval}

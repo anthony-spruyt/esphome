@@ -1,0 +1,17 @@
+services:
+  esphome:
+    image: esphome/esphome:latest
+    container_name: esphome
+    volumes:
+      - ~/esphome/config:/config
+      - ~/esphome/build:/build
+    ports:
+      - "6052:6052"
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    environment:
+      - TZ=Australia/Melbourne
+      - ESPHOME_BUILD_PATH=/build
+    privileged: true
+

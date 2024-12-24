@@ -1,0 +1,4 @@
+wifi:
+  ap:
+    password: !secret wifi_ap_password
+    channel: 11

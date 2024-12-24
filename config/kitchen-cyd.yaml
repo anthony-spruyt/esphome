@@ -1,0 +1,12 @@
+packages:
+  device: !include {
+    file: packages/devices/.power-dashboard.yaml,
+    vars: {
+      device_name: kitchen-cyd,
+      device_friendly_name: kitchen-cyd,
+      sensor_generation: sensor.sungrow_active_generation,
+      sensor_export: sensor.sungrow_active_export_to_grid,
+      sensor_consumption: sensor.home_net_power,
+      sensor_import: sensor.powerpal_power
+    }
+  }

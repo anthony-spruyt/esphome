@@ -1,0 +1,11 @@
+packages:
+  board: !include ../boards/.dev.yaml
+  bt: !include ../common/.bt.yaml
+  bh1750: !include ../components/.bh1750.yaml
+
+esp32:
+  framework: 
+    type: esp-idf
+
+status_led:
+  pin: GPIO2
