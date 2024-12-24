@@ -1,3 +1,2 @@
-/build
-/config/.esphome
-/config/secrets.yaml
+/build/*
+!/build/.createfolder
