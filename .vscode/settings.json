@@ -5,6 +5,11 @@
     "esphome.dashboard.url": "http://http://localhost:6052",
     "yaml.schemas": {
       "https://raw.githubusercontent.com/esphome/esphome/main/esphome/schemas/configuration.json": "*.yaml"
+    },
+    "files.exclude": {
+      "build/**": true,
+      "config/.esphome/**": true,
+      "**/.gitignore": true
     }
   }
   
