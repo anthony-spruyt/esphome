@@ -13,5 +13,11 @@ services:
     environment:
       - TZ=Australia/Melbourne
       - ESPHOME_BUILD_PATH=/build
+      - ESPHOME_DASHBOARD_USE_PING=true
     privileged: true
+    networks:
+      - esphome_network
 
+networks:
+  esphome_network:
+    driver: bridge
