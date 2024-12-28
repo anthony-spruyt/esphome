@@ -16,6 +16,19 @@ packages:
       update_interval: 60s
     }
   }
+  ds18b20-1: !include {
+    file: packages/components/.ds18b20.yaml,
+    vars: {
+      update_interval: 60s,
+      name: "DS18B20 1 Temperature",
+      pin: GPIO4,
+      address: 0xb33c01e076967828
+    }
+  }
+  # Uncomment to find address of DS18B20
+  #debug-log: !include {
+  #  file: packages/debug/.log.yaml
+  #}
 
 esp32:
   framework: 
