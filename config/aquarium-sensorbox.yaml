@@ -1,0 +1,8 @@
+packages:
+  board: !include {
+    file: packages/devices/.aquarium-sensorbox.yaml,
+    vars: {
+      device_name: aquarium-sensorbox,
+      device_friendly_name: aquarium-sensorbox
+    }
+  }

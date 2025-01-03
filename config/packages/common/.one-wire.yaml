@@ -1,0 +1,4 @@
+one_wire:
+  - platform: gpio
+    id: onewire
+    pin: ${pin}
