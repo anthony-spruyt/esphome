@@ -1,0 +1,20 @@
+packages:
+  board: !include ../boards/.c3-super-mini.yaml
+  bt: !include ../common/.bt.yaml
+  aht20-bmp280: !include ../components/.aht20-bmp280.yaml
+  #debug-log: !include {
+  #  file: ../debug/.log.yaml
+  #}
+
+esp32:
+  framework: 
+    type: esp-idf
+
+i2c:
+  - id: i2c_aht20_bmp280
+    sda: ${i2c_sda}
+    scl: ${i2c_scl}
+    scan: true
+
+status_led:
+  pin: GPIO8

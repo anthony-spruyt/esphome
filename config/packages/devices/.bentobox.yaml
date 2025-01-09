@@ -1,0 +1,27 @@
+packages:
+  board: !include ../boards/.c3-super-mini.yaml
+  #debug-log: !include {
+  #  file: ../debug/.log.yaml
+  #}
+
+esp32:
+  framework: 
+    type: esp-idf
+
+status_led:
+  pin: GPIO8
+
+output:
+  - platform: ledc
+    id: fan_pwm
+    pin: GPIO4
+    frequency: 20000 Hz
+    min_power: 0%
+    max_power: 100%  
+
+
+fan:
+  - platform: speed
+    output:  fan_pwm
+    name: "Bentobox Fan"
+    speed_count: 100

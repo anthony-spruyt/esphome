@@ -1,0 +1,10 @@
+# ESP32 C3 Super Mini
+packages:
+  base: !include ../common/.base.yaml
+
+esphome:
+  platformio_options:
+    board_build.flash_mode: dio
+
+esp32:
+  board: esp32-c3-devkitm-1

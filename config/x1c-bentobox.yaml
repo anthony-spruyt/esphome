@@ -1,0 +1,8 @@
+packages:
+  device: !include {
+    file: packages/devices/.bentobox.yaml,
+    vars: {
+      device_name: x1c-bentobox,
+      device_friendly_name: x1c-bentobox
+    }
+  }
