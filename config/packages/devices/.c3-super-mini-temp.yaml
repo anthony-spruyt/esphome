@@ -1,6 +1,6 @@
 packages:
   board: !include ../boards/.c3-super-mini.yaml
-  bt: !include ../common/.bt.yaml
+  #bt: !include ../common/.bt.yaml # Running BT tracking causes WiFi to be too unstable.
   aht20-bmp280: !include ../components/.aht20-bmp280.yaml
   #debug-log: !include {
   #  file: ../debug/.log.yaml

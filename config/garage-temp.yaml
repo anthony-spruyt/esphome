@@ -1,10 +1,10 @@
 # The BMP280 is defective on this unit =*(
 packages:
   #device: !include {
-  #  file: packages/devices/.c3-mini-tracker-and-temp.yaml,
+  #  file: packages/devices/.c3-super-mini-temp.yaml,
   #  vars: {
-  #    device_name: garage-tracker-and-temp,
-  #    device_friendly_name: garage-tracker-and-temp,
+  #    device_name: garage-temp,
+  #    device_friendly_name: garage-temp,
   #    i2c_sda: 10,
   #    i2c_scl: 9,
   #    aht20_address: 0x38,
@@ -15,11 +15,11 @@ packages:
   board: !include {
     file: packages/boards/.c3-super-mini.yaml,
     vars: {
-      device_name: garage-tracker-and-temp,
-      device_friendly_name: garage-tracker-and-temp
+      device_name: garage-temp,
+      device_friendly_name: garage-temp
     }
   }
-  bt: !include packages/common/.bt.yaml
+  #bt: !include packages/common/.bt.yaml # Running BT tracking causes WiFi to be too unstable.
   #debug-log: !include {
   #  file: packages/debug/.log.yaml
   #}

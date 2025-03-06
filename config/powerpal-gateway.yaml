@@ -10,3 +10,6 @@ packages:
       ble_pairing_code: !secret powerpal_ble_pairing_code
     }
   }
+  #debug-log: !include {
+  #  file: packages/debug/.log.yaml
+  #}

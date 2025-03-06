@@ -36,15 +36,19 @@ image:
   - file: mdi:transmission-tower-export
     id: transmission_tower_export_icon
     resize: 30x30
+    type: GRAYSCALE
   - file: mdi:transmission-tower-import
     id: transmission_tower_import_icon
     resize: 30x30
+    type: GRAYSCALE
   - file: mdi:home
     id: home_icon
     resize: 30x30
+    type: GRAYSCALE
   - file: mdi:solar-power
     id: solar_power_icon
     resize: 30x30
+    type: GRAYSCALE
 
 lvgl:
   # Buffer size for rendering (DO NOT CHANGE OTHERWISE IT CRASHES DUE TO PSRAM SHORTAGE)
