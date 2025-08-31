@@ -1,2 +1,4 @@
 /build/*
 !/build/.createfolder
+config/custom_components/http_request/__pycache__/**
+config/custom_components/powerpal_ble/__pycache__/**
