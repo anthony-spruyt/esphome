@@ -1,0 +1,7 @@
+packages:
+  wifi-base: !include .wifi-base.yaml
+
+wifi:
+  ssid: !secret wifi_ssid_garage_iot
+  password: !secret wifi_password_garage_iot
+  fast_connect: true

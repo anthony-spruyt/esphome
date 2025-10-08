@@ -1,49 +1,14 @@
-# The BMP280 is defective on this unit =*(
 packages:
-  #device: !include {
-  #  file: packages/devices/.c3-super-mini-temp.yaml,
-  #  vars: {
-  #    device_name: garage-temp,
-  #    device_friendly_name: garage-temp,
-  #    i2c_sda: 10,
-  #    i2c_scl: 9,
-  #    aht20_address: 0x38,
-  #    bmp280_address: 0x77,
-  #    update_interval: 60s
-  #  }
-  #}
-  board: !include {
-    file: packages/boards/.c3-super-mini.yaml,
+  wifi: !include packages/common/.wifi-garage-iot.yaml
+  device: !include {
+    file: packages/devices/.c3-super-mini-temp.yaml,
     vars: {
       device_name: garage-temp,
-      device_friendly_name: garage-temp
+      device_friendly_name: garage-temp,
+      i2c_sda: GPIO6,
+      i2c_scl: GPIO7,
+      aht20_address: 0x38,
+      bmp280_address: 0x77,
+      update_interval: 60s
     }
   }
-  #bt: !include packages/common/.bt.yaml # Running BT tracking causes WiFi to be too unstable.
-  #debug-log: !include {
-  #  file: packages/debug/.log.yaml
-  #}
-
-esp32:
-  framework: 
-    type: esp-idf
-
-status_led:
-  pin: GPIO8
-
-i2c:
-  - id: i2c_aht20
-    sda: 10
-    scl: 9
-    scan: true
-  
-sensor:
-  - platform: aht10
-    variant: AHT20
-    i2c_id: i2c_aht20
-    address: 0x38
-    temperature:
-      name: "Temperature"
-    humidity:
-      name: "Humidity"
-    update_interval: 60s

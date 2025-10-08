@@ -1,0 +1,12 @@
+packages:
+  board: !include ../boards/.c3-super-mini.yaml
+  debug-log: !include {
+    file: ../debug/.log.yaml
+  }
+
+esp32:
+  framework: 
+    type: esp-idf
+
+status_led:
+  pin: GPIO8

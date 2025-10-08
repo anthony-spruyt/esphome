@@ -10,11 +10,5 @@ esp32:
   framework: 
     type: esp-idf
 
-i2c:
-  - id: i2c_aht20_bmp280
-    sda: ${i2c_sda}
-    scl: ${i2c_scl}
-    scan: true
-
 status_led:
   pin: GPIO8

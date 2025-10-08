@@ -1,4 +1,5 @@
 packages:
+  wifi: !include packages/common/.wifi-iot.yaml
   board: !include {
     file: packages/devices/.aquarium-sensorbox.yaml,
     vars: {

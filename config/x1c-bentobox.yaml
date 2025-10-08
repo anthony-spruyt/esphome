@@ -1,4 +1,5 @@
 packages:
+  wifi: !include packages/common/.wifi-garage-iot.yaml
   device: !include {
     file: packages/devices/.bentobox.yaml,
     vars: {

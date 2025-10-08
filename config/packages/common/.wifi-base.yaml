@@ -1,8 +1,3 @@
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  fast_connect: true
-
 api:
   encryption:
     key: !secret api_encryption_key

@@ -1,6 +1,6 @@
 services:
   esphome:
-    image: esphome/esphome:latest
+    image: esphome/esphome:2025.6.3
     container_name: esphome
     volumes:
       - ~/esphome/config:/config

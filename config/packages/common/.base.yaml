@@ -2,9 +2,6 @@ esphome:
   name: ${device_name}
   friendly_name: ${device_friendly_name}
 
-packages:
-  wifi: !include .wifi.yaml
-
 logger:
   level: INFO
   logs:

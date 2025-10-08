@@ -1,0 +1,8 @@
+packages:
+  device: !include {
+    file: packages/devices/.c3-super-mini-test.yaml,
+    vars: {
+      device_name: super-mini-test,
+      device_friendly_name: super-mini-test
+    }
+  }

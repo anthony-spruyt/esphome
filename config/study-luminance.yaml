@@ -1,4 +1,5 @@
 packages:
+  wifi: !include packages/common/.wifi-study-iot.yaml
   device: !include {
     file: packages/devices/.luminance.yaml,
     vars: {
