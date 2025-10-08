@@ -1,20 +1,12 @@
 packages:
   board: !include ../boards/.m5stack-atom-lite.yaml
 
-esp32:
-  framework: 
-    type: arduino
-    version: "2.0.15"
-
 external_components:
   - source:
-      type: local
-      path: custom_components
-    components: [powerpal_ble, http_request]
-
-# optional requirement to enable powerpal cloud uploading
-http_request:
-  id: powerpal_cloud_uploader
+      type: git
+      url: https://github.com/SleepinDevil/esphome-powerpal_ble.git
+    components: [ powerpal_ble ]
+    refresh: 1d
 
 # optional requirement used with daily energy sensor
 time:
@@ -44,7 +36,3 @@ sensor:
     notification_interval: 1 # get updates every 1 minute
     pulses_per_kwh: 1000
     time_id: homeassistant_time # daily energy still works without a time_id, but recommended to include one to properly handle daylight savings, etc.
-#    http_request_id: powerpal_cloud_uploader
-#    cost_per_kwh: 0.20 #dollars per kWh
-#    powerpal_device_id: 0000abcd #optional, component will retrieve from your Powerpal if not set
-#    powerpal_apikey: 4a89e298-b17b-43e7-a0c1-fcd1412e98ef #optional, component will retrieve from your Powerpal if not set
