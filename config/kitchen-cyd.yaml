@@ -1,5 +1,11 @@
 packages:
   wifi: !include packages/common/.wifi-iot.yaml
+  captive_portal: !include { 
+    file: packages/common/.captive-portal.yaml,
+    vars: {
+      device_name: kitchen-cyd
+    }
+  }
   device: !include {
     file: packages/devices/.power-dashboard.yaml,
     vars: {

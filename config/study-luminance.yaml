@@ -1,5 +1,11 @@
 packages:
-  wifi: !include packages/common/.wifi-study-iot.yaml
+  wifi: !include packages/common/.wifi-iot.yaml
+  captive_portal: !include { 
+    file: packages/common/.captive-portal.yaml,
+    vars: {
+      device_name: study-luminance
+    }
+  }
   device: !include {
     file: packages/devices/.luminance.yaml,
     vars: {

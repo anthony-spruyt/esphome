@@ -1,1 +1,6 @@
 captive_portal:
+
+wifi:
+  ap:
+    ssid: "${device_name} AP"
+    password: !secret wifi_ap_password

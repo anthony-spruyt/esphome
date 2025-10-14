@@ -1,6 +1,10 @@
 packages:
   board: !include ../boards/.m5stack-atom-lite.yaml
 
+esp32:
+  framework: 
+    type: esp-idf
+
 external_components:
   - source:
       type: git
