@@ -27,12 +27,15 @@ api:
           - lvgl.widget.hide: lbl_hastatus
 
 image:
+  defaults:
+    type: rgb565
+  images:
   #- file: https://esphome.io/_static/favicon-512x512.png
   #  id: boot_logo
   #  resize: 200x200
   #  type: RGB565
   #  # Use transparency for light background
-  #  use_transparency: true
+  #  transparency: alpha_channel
   - file: mdi:transmission-tower-export
     id: transmission_tower_export_icon
     resize: 30x30
