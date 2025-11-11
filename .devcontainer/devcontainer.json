@@ -10,7 +10,12 @@
 				"ESPHome.esphome-vscode"
 			]
 		}
-	}
+	},
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind",
+		"source=${localEnv:HOME}/.kilocode,target=/workspaces/spruyt-labs/.kilocode,type=bind"
+	]
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
