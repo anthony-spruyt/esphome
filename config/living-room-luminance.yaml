@@ -1,19 +1,20 @@
 packages:
   wifi: !include packages/common/.wifi-iot.yaml
-  captive_portal: !include { 
-    file: packages/common/.captive-portal.yaml,
-    vars: {
-      device_name: living-room-luminance
+  captive_portal:
+    !include {
+      file: packages/common/.captive-portal.yaml,
+      vars: { device_name: living-room-luminance },
     }
-  }
-  device: !include {
-    file: packages/devices/.luminance.yaml,
-    vars: {
-      device_name: living-room-luminance,
-      device_friendly_name: living-room-luminance,
-      i2c_sda: 21,
-      i2c_scl: 22,
-      i2c_address: 0x23,
-      update_interval: 30s
+  device:
+    !include {
+      file: packages/devices/.luminance.yaml,
+      vars:
+        {
+          device_name: living-room-luminance,
+          device_friendly_name: living-room-luminance,
+          i2c_sda: 21,
+          i2c_scl: 22,
+          i2c_address: 0x23,
+          update_interval: 30s,
+        },
     }
-  }

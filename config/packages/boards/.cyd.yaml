@@ -12,7 +12,7 @@ light:
     name: Display Backlight
     id: backlight
     restore_mode: ALWAYS_ON
-  # Set up the LED on the back 
+  # Set up the LED on the back
   - platform: rgb
     name: LED
     id: led

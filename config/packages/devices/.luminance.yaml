@@ -4,8 +4,10 @@ packages:
   bh1750: !include ../components/.bh1750.yaml
 
 esp32:
-  framework: 
+  framework:
     type: esp-idf
+    advanced:
+      minimum_chip_revision: "3.1"
 
 status_led:
   pin: GPIO2

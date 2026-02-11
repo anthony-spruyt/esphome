@@ -2,14 +2,16 @@ packages:
   board: !include ../boards/.m5stack-atom-lite.yaml
 
 esp32:
-  framework: 
+  framework:
     type: esp-idf
+    advanced:
+      minimum_chip_revision: "1.1"
 
 external_components:
   - source:
       type: git
       url: https://github.com/gurrier/esphome-powerpal_ble.git
-    components: [ powerpal_ble ]
+    components: [powerpal_ble]
     refresh: 1d
 
 # optional requirement used with daily energy sensor

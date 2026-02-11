@@ -1,15 +1,23 @@
 {
-    "files.associations": {
-      "*.yaml": "esphome"
-    },
-    "esphome.dashboard.url": "http://http://localhost:6052",
-    "yaml.schemas": {
-      "https://raw.githubusercontent.com/esphome/esphome/main/esphome/schemas/configuration.json": "*.yaml"
-    },
-    "files.exclude": {
-      "build/**": true,
-      "config/.esphome/**": true,
-      "**/.gitignore": true
-    }
-  }
-  
+  "files.associations": {
+    "*.yaml": "esphome"
+  },
+  "esphome.dashboard.url": "http://http://localhost:6052",
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/esphome/esphome/main/esphome/schemas/configuration.json": "*.yaml"
+  },
+  "files.exclude": {
+    "build/**": true,
+    "config/.esphome/**": true,
+    "**/.gitignore": true
+  },
+  "search.useIgnoreFiles": false,
+  "search.useGlobalIgnoreFiles": false,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveWorkspaceFilesOnly": true,
+  "editor.formatOnSave": true,
+  "editor.codeActions.triggerOnFocusChange": false,
+  "explorer.sortOrder": "type",
+  "editor.tabSize": 2,
+  "chat.agent.enabled": false
+}

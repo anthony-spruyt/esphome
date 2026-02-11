@@ -2,8 +2,10 @@ packages:
   board: !include ../boards/.cyd.yaml
 
 esp32:
-  framework: 
+  framework:
     type: esp-idf
+    advanced:
+      minimum_chip_revision: "1.0"
 
 #esphome:
 #  on_boot:
@@ -30,28 +32,28 @@ image:
   defaults:
     type: rgb565
   images:
-  #- file: https://esphome.io/_static/favicon-512x512.png
-  #  id: boot_logo
-  #  resize: 200x200
-  #  type: RGB565
-  #  # Use transparency for light background
-  #  transparency: alpha_channel
-  - file: mdi:transmission-tower-export
-    id: transmission_tower_export_icon
-    resize: 30x30
-    type: GRAYSCALE
-  - file: mdi:transmission-tower-import
-    id: transmission_tower_import_icon
-    resize: 30x30
-    type: GRAYSCALE
-  - file: mdi:home
-    id: home_icon
-    resize: 30x30
-    type: GRAYSCALE
-  - file: mdi:solar-power
-    id: solar_power_icon
-    resize: 30x30
-    type: GRAYSCALE
+    #- file: https://esphome.io/_static/favicon-512x512.png
+    #  id: boot_logo
+    #  resize: 200x200
+    #  type: RGB565
+    #  # Use transparency for light background
+    #  transparency: alpha_channel
+    - file: mdi:transmission-tower-export
+      id: transmission_tower_export_icon
+      resize: 30x30
+      type: GRAYSCALE
+    - file: mdi:transmission-tower-import
+      id: transmission_tower_import_icon
+      resize: 30x30
+      type: GRAYSCALE
+    - file: mdi:home
+      id: home_icon
+      resize: 30x30
+      type: GRAYSCALE
+    - file: mdi:solar-power
+      id: solar_power_icon
+      resize: 30x30
+      type: GRAYSCALE
 
 lvgl:
   # Buffer size for rendering (DO NOT CHANGE OTHERWISE IT CRASHES DUE TO PSRAM SHORTAGE)
@@ -177,21 +179,21 @@ lvgl:
             styles: header_footer
           rows:
             - buttons:
-              - id: page_prev
-                text: "\uF053"
-                on_press:
-                  then:
-                    lvgl.page.previous:
-              - id: page_home
-                text: "\uF015"
-                on_press:
-                  then:
-                    lvgl.page.show: active_power_page
-              - id: page_next
-                text: "\uF054"
-                on_press:
-                  then:
-                    lvgl.page.next:
+                - id: page_prev
+                  text: "\uF053"
+                  on_press:
+                    then:
+                      lvgl.page.previous:
+                - id: page_home
+                  text: "\uF015"
+                  on_press:
+                    then:
+                      lvgl.page.show: active_power_page
+                - id: page_next
+                  text: "\uF054"
+                  on_press:
+                    then:
+                      lvgl.page.next:
       # Connectivity status icon
       - label:
           text: "\uF1EB"

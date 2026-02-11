@@ -7,7 +7,7 @@ packages:
   #}
 
 esp32:
-  framework: 
+  framework:
     type: esp-idf
 
 status_led:

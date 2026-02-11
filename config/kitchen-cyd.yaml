@@ -1,19 +1,20 @@
 packages:
   wifi: !include packages/common/.wifi-iot.yaml
-  captive_portal: !include { 
-    file: packages/common/.captive-portal.yaml,
-    vars: {
-      device_name: kitchen-cyd
+  captive_portal:
+    !include {
+      file: packages/common/.captive-portal.yaml,
+      vars: { device_name: kitchen-cyd },
     }
-  }
-  device: !include {
-    file: packages/devices/.power-dashboard.yaml,
-    vars: {
-      device_name: kitchen-cyd,
-      device_friendly_name: kitchen-cyd,
-      sensor_generation: sensor.sungrow_active_generation,
-      sensor_export: sensor.sungrow_active_export_to_grid,
-      sensor_consumption: sensor.home_net_power,
-      sensor_import: sensor.powerpal_power
+  device:
+    !include {
+      file: packages/devices/.power-dashboard.yaml,
+      vars:
+        {
+          device_name: kitchen-cyd,
+          device_friendly_name: kitchen-cyd,
+          sensor_generation: sensor.sungrow_active_generation,
+          sensor_export: sensor.sungrow_active_export_to_grid,
+          sensor_consumption: sensor.home_net_power,
+          sensor_import: sensor.powerpal_power,
+        },
     }
-  }

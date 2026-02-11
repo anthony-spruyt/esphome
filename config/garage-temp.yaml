@@ -1,14 +1,16 @@
 packages:
   wifi: !include packages/common/.wifi-garage-iot.yaml
-  device: !include {
-    file: packages/devices/.c3-super-mini-temp.yaml,
-    vars: {
-      device_name: garage-temp,
-      device_friendly_name: garage-temp,
-      i2c_sda: GPIO6,
-      i2c_scl: GPIO7,
-      aht20_address: 0x38,
-      bmp280_address: 0x77,
-      update_interval: 60s
+  device:
+    !include {
+      file: packages/devices/.c3-super-mini-temp.yaml,
+      vars:
+        {
+          device_name: garage-temp,
+          device_friendly_name: garage-temp,
+          i2c_sda: GPIO6,
+          i2c_scl: GPIO7,
+          aht20_address: 0x38,
+          bmp280_address: 0x77,
+          update_interval: 60s,
+        },
     }
-  }

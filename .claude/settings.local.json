@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:esphome.io)",
+      "Bash(gh pr view:*)",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}

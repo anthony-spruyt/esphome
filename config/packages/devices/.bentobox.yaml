@@ -5,7 +5,7 @@ packages:
   #}
 
 esp32:
-  framework: 
+  framework:
     type: esp-idf
 
 status_led:
@@ -17,11 +17,10 @@ output:
     pin: GPIO4
     frequency: 20000 Hz
     min_power: 0%
-    max_power: 100%  
-
+    max_power: 100%
 
 fan:
   - platform: speed
-    output:  fan_pwm
+    output: fan_pwm
     name: "Bentobox Fan"
     speed_count: 100

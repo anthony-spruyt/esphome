@@ -1,45 +1,48 @@
 packages:
   board: !include ../boards/.dev.yaml
-  aht20-bmp280: !include {
-    file: ../components/.aht20-bmp280.yaml,
-    vars: {
-      i2c_sda: 21,
-      i2c_scl: 22,
-      aht20_address: 0x38,
-      bmp280_address: 0x77,
-      update_interval: 60s
+  aht20-bmp280:
+    !include {
+      file: ../components/.aht20-bmp280.yaml,
+      vars:
+        {
+          i2c_sda: 21,
+          i2c_scl: 22,
+          aht20_address: 0x38,
+          bmp280_address: 0x77,
+          update_interval: 60s,
+        },
     }
-  }
-  one-wire: !include {
-    file: ../common/.one-wire.yaml,
-    vars: {
-      pin: GPIO4
+  one-wire: !include { file: ../common/.one-wire.yaml, vars: { pin: GPIO4 } }
+  ds18b20-1:
+    !include {
+      file: ../components/.ds18b20.yaml,
+      vars:
+        {
+          update_interval: 60s,
+          name: "DS18B20 1 Temperature",
+          address: 0xb33c01e076967828,
+        },
     }
-  }
-  ds18b20-1: !include {
-    file: ../components/.ds18b20.yaml,
-    vars: {
-      update_interval: 60s,
-      name: "DS18B20 1 Temperature",
-      address: 0xb33c01e076967828
+  ds18b20-2:
+    !include {
+      file: ../components/.ds18b20.yaml,
+      vars:
+        {
+          update_interval: 60s,
+          name: "DS18B20 2 Temperature",
+          address: 0xfc3c01e0765c1628,
+        },
     }
-  }
-  ds18b20-2: !include {
-    file: ../components/.ds18b20.yaml,
-    vars: {
-      update_interval: 60s,
-      name: "DS18B20 2 Temperature",
-      address: 0xfc3c01e0765c1628
-    }
-  }
   # Uncomment to find address of DS18B20
   #debug-log: !include {
   #  file: ../debug/.log.yaml
   #}
 
 esp32:
-  framework: 
+  framework:
     type: esp-idf
+    advanced:
+      minimum_chip_revision: "3.1"
 
 status_led:
   pin: GPIO2

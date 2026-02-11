@@ -3,7 +3,7 @@ i2c:
     sda: ${i2c_sda}
     scl: ${i2c_scl}
     scan: true
-  
+
 sensor:
   - platform: aht10
     variant: AHT20
