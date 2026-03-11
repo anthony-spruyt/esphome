@@ -3,15 +3,15 @@ packages:
   captive_portal:
     !include {
       file: packages/common/.captive-portal.yaml,
-      vars: { device_name: study-luminance },
+      vars: { device_name: garage-luminance },
     }
   device:
     !include {
       file: packages/devices/.luminance.yaml,
       vars:
         {
-          device_name: study-luminance,
-          device_friendly_name: study-luminance,
+          device_name: garage-luminance,
+          device_friendly_name: garage-luminance,
           i2c_sda: 21,
           i2c_scl: 22,
           i2c_address: 0x23,
