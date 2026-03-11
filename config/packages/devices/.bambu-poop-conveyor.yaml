@@ -165,6 +165,7 @@ script:
           id(yellow_flash_active) = false;
           id(yellow_led_state) = false;
       - output.turn_off: out_led_yellow
+      - output.turn_on: out_led_red
       - binary_sensor.template.publish:
           id: conveyor_running
           state: true
