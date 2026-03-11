@@ -19,11 +19,3 @@ packages:
 # auto-triggering (see device package for details):
 substitutions:
   bambu_stage_entity: sensor.x1c_00m09d481300719_current_stage
-
-api:
-  encryption:
-    key: !secret api_encryption_key
-
-ota:
-  - platform: esphome
-    password: !secret ota_password
