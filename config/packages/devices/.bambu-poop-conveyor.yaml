@@ -240,7 +240,7 @@ text_sensor:
           condition:
             and:
               - lambda: |-
-                  return x == "Cleaning nozzle tip" || x == "Changing filament";
+                  return x == "cleaning_nozzle_tip" || x == "changing_filament";
               - not:
                   script.is_running: run_conveyor
           then:
