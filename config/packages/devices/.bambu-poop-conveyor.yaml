@@ -30,6 +30,12 @@ esp32:
     advanced:
       minimum_chip_revision: "3.1"
 
+esphome:
+  on_boot:
+    priority: -100 # Run after all components are initialised
+    then:
+      - output.turn_on: out_led_green
+
 # ------- Motor timing & direction (configurable from HA) ------- #
 
 number:
@@ -189,8 +195,7 @@ script:
       - output.turn_on: out_led_green
 
       - delay: !lambda "return (uint32_t)(id(cfg_cooldown).state * 1000);"
-
-      - output.turn_off: out_led_green
+      # Cooldown done — back to idle (green stays on)
 
 # ------- Sensors ------- #
 
@@ -276,4 +281,4 @@ button:
           state: false
       - output.turn_off: out_led_red
       - output.turn_off: out_led_yellow
-      - output.turn_off: out_led_green
+      - output.turn_on: out_led_green
