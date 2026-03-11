@@ -222,27 +222,24 @@ binary_sensor:
           then:
             - script.execute: run_conveyor
 
-sensor:
-  # --- Option B: Auto-trigger from HA Bambu integration sensor ---
-  # Uncomment and set bambu_stage_entity in your top-level config to a
-  # *numeric* HA sensor reporting the Bambu print stage integer.
-  # Known trigger values: 4 (Changing filament), 14 (Cleaning nozzle tip)
-  #
-  # Example using bambu_lab HACS integration:
-  #   bambu_stage_entity: sensor.x1c_current_stage_number
-  #
-  # - platform: homeassistant
-  #   id: bambu_print_stage
-  #   entity_id: ${bambu_stage_entity}
-  #   on_value:
-  #     - if:
-  #         condition:
-  #           and:
-  #             - lambda: "return x == 4.0f || x == 14.0f;"
-  #             - not:
-  #                 script.is_running: run_conveyor
-  #         then:
-  #           - script.execute: run_conveyor
+# Auto-trigger from HA Bambu integration (bambu_stage_entity set in top-level config)
+# The Bambu HA integration exposes current_stage as a text sensor, so we use
+# text_sensor homeassistant platform and match on the string values.
+# Triggers on: "Cleaning nozzle tip" (purge) and "Changing filament"
+text_sensor:
+  - platform: homeassistant
+    id: bambu_print_stage
+    entity_id: ${bambu_stage_entity}
+    on_value:
+      - if:
+          condition:
+            and:
+              - lambda: |-
+                  return x == "Cleaning nozzle tip" || x == "Changing filament";
+              - not:
+                  script.is_running: run_conveyor
+          then:
+            - script.execute: run_conveyor
 
 # ------- Buttons ------- #
 

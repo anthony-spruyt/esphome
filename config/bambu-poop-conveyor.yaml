@@ -17,8 +17,8 @@ packages:
 
 # Uncomment and set to your HA Bambu stage sensor entity_id to enable
 # auto-triggering (see device package for details):
-# substitutions:
-#   bambu_stage_entity: sensor.x1c_current_stage_number
+substitutions:
+  bambu_stage_entity: sensor.x1c_00m09d481300719_current_stage
 
 api:
   encryption:
