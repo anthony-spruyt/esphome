@@ -1,0 +1,29 @@
+packages:
+  wifi: !include packages/common/.wifi-garage-iot.yaml
+  captive_portal:
+    !include {
+      file: packages/common/.captive-portal.yaml,
+      vars: { device_name: bambu-poop-conveyor },
+    }
+  device:
+    !include {
+      file: packages/devices/.bambu-poop-conveyor.yaml,
+      vars:
+        {
+          device_name: bambu-poop-conveyor,
+          device_friendly_name: Bambu Poop Conveyor,
+        },
+    }
+
+# Uncomment and set to your HA Bambu stage sensor entity_id to enable
+# auto-triggering (see device package for details):
+# substitutions:
+#   bambu_stage_entity: sensor.x1c_current_stage_number
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password

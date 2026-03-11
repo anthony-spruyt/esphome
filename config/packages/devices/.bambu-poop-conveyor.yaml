@@ -1,0 +1,282 @@
+# Bambu Poop Conveyor - ESPHome Device Package
+#
+# Hardware: L298N H-bridge + ESP32 WROOM-32D
+# Motor wiring:
+#   IN1 -> GPIO23, IN2 -> GPIO21, EN (PWM) -> GPIO15
+# LEDs (with 470Ω resistors):
+#   Green -> GPIO19, Yellow -> GPIO18, Red -> GPIO4
+# Motion sensor (optional PIR):
+#   OUT -> GPIO22
+#
+# Trigger via Home Assistant:
+#   Option A (recommended): Create an HA automation that calls button.press
+#                           on "Run Conveyor Now" when Bambu purge stage detected.
+#   Option B: Set bambu_stage_entity substitution to a numeric HA sensor
+#             that reports the Bambu print stage (integer).
+#             Stages that trigger: 4 (Changing filament), 14 (Cleaning nozzle tip)
+#
+# Required substitutions (from top-level config):
+#   device_name, device_friendly_name
+# Optional substitutions:
+#   bambu_stage_entity  - HA entity_id of numeric Bambu print stage sensor
+#                         (leave as "sensor.disabled" to skip auto-trigger)
+
+packages:
+  board: !include ../boards/.dev.yaml
+
+esp32:
+  framework:
+    type: esp-idf
+    advanced:
+      minimum_chip_revision: "3.1"
+
+# ------- Motor timing & direction (configurable from HA) ------- #
+
+number:
+  - platform: template
+    id: cfg_wait_time
+    name: "Wait Before Run"
+    icon: mdi:timer-sand
+    unit_of_measurement: "s"
+    min_value: 0
+    max_value: 30
+    step: 1
+    initial_value: 5
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+  - platform: template
+    id: cfg_run_time
+    name: "Motor Run Time"
+    icon: mdi:timer-play
+    unit_of_measurement: "s"
+    min_value: 1
+    max_value: 60
+    step: 1
+    initial_value: 10
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+  - platform: template
+    id: cfg_cooldown
+    name: "Cooldown After Run"
+    icon: mdi:timer-pause
+    unit_of_measurement: "s"
+    min_value: 0
+    max_value: 600
+    step: 10
+    initial_value: 120
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+select:
+  - platform: template
+    id: cfg_direction
+    name: "Motor Direction"
+    icon: mdi:swap-horizontal
+    options:
+      - "Forward"
+      - "Reverse"
+    initial_option: "Reverse"
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+# ------- Outputs ------- #
+
+output:
+  # L298N direction pins
+  - platform: gpio
+    id: out_motor_in1
+    pin: GPIO23
+
+  - platform: gpio
+    id: out_motor_in2
+    pin: GPIO21
+
+  # L298N enable pin (PWM speed control)
+  - platform: ledc
+    id: out_motor_en
+    pin: GPIO15
+    frequency: 5000 Hz
+
+  # Status LEDs
+  - platform: gpio
+    id: out_led_green
+    pin: GPIO19
+
+  - platform: gpio
+    id: out_led_yellow
+    pin: GPIO18
+
+  - platform: gpio
+    id: out_led_red
+    pin: GPIO4
+
+# ------- Yellow flash state ------- #
+
+globals:
+  - id: yellow_flash_active
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: yellow_led_state
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+# Flashes yellow LED every 500ms while waiting (matches original firmware behaviour)
+interval:
+  - interval: 500ms
+    then:
+      - if:
+          condition:
+            lambda: "return id(yellow_flash_active);"
+          then:
+            - lambda: |-
+                id(yellow_led_state) = !id(yellow_led_state);
+                id(out_led_yellow).set_state(id(yellow_led_state));
+
+# ------- Conveyor run script ------- #
+# Sequence: wait (yellow flashing) → run motor (red) → cooldown (green)
+
+script:
+  - id: run_conveyor
+    mode: single # Drop new triggers while a cycle is already running
+    then:
+      # Waiting phase: yellow flashes, green off, red off
+      - output.turn_off: out_led_green
+      - output.turn_off: out_led_red
+      - lambda: "id(yellow_flash_active) = true;"
+
+      - delay: !lambda "return (uint32_t)(id(cfg_wait_time).state * 1000);"
+
+      # Running phase: red on, yellow off
+      - lambda: |-
+          id(yellow_flash_active) = false;
+          id(yellow_led_state) = false;
+      - output.turn_off: out_led_yellow
+      - binary_sensor.template.publish:
+          id: conveyor_running
+          state: true
+      - lambda: |-
+          if (id(cfg_direction).current_option() == "Forward") {
+            id(out_motor_in1).turn_off();
+            id(out_motor_in2).turn_on();
+          } else {
+            id(out_motor_in1).turn_on();
+            id(out_motor_in2).turn_off();
+          }
+      - output.set_level:
+          id: out_motor_en
+          level: 88% # ~225/255, matching original firmware duty cycle
+
+      - delay: !lambda "return (uint32_t)(id(cfg_run_time).state * 1000);"
+
+      # Stop motor
+      - output.turn_off: out_motor_en
+      - output.turn_off: out_motor_in1
+      - output.turn_off: out_motor_in2
+      - binary_sensor.template.publish:
+          id: conveyor_running
+          state: false
+
+      # Cooldown phase: green on, no re-trigger allowed
+      - output.turn_off: out_led_red
+      - output.turn_on: out_led_green
+
+      - delay: !lambda "return (uint32_t)(id(cfg_cooldown).state * 1000);"
+
+      - output.turn_off: out_led_green
+
+# ------- Sensors ------- #
+
+binary_sensor:
+  # Exposed motor running state (usable in HA automations)
+  - platform: template
+    id: conveyor_running
+    name: "Conveyor Running"
+    device_class: running
+
+  # Optional PIR motion sensor (AM312 or similar, active-high)
+  # Wire: VCC=3.3V, GND=GND, OUT=GPIO22
+  - platform: gpio
+    pin:
+      number: GPIO22
+      mode:
+        input: true
+        pulldown: true
+    id: pir_sensor
+    name: "Motion Sensor"
+    device_class: motion
+    filters:
+      - delayed_off: 2s
+    on_press:
+      - if:
+          condition:
+            not:
+              script.is_running: run_conveyor
+          then:
+            - script.execute: run_conveyor
+
+sensor:
+  # --- Option B: Auto-trigger from HA Bambu integration sensor ---
+  # Uncomment and set bambu_stage_entity in your top-level config to a
+  # *numeric* HA sensor reporting the Bambu print stage integer.
+  # Known trigger values: 4 (Changing filament), 14 (Cleaning nozzle tip)
+  #
+  # Example using bambu_lab HACS integration:
+  #   bambu_stage_entity: sensor.x1c_current_stage_number
+  #
+  # - platform: homeassistant
+  #   id: bambu_print_stage
+  #   entity_id: ${bambu_stage_entity}
+  #   on_value:
+  #     - if:
+  #         condition:
+  #           and:
+  #             - lambda: "return x == 4.0f || x == 14.0f;"
+  #             - not:
+  #                 script.is_running: run_conveyor
+  #         then:
+  #           - script.execute: run_conveyor
+
+# ------- Buttons ------- #
+
+button:
+  # Manual trigger (also callable from HA automations / scripts)
+  - platform: template
+    id: btn_run
+    name: "Run Conveyor Now"
+    icon: mdi:arrow-right-bold
+    on_press:
+      - if:
+          condition:
+            not:
+              script.is_running: run_conveyor
+          then:
+            - script.execute: run_conveyor
+
+  # Emergency stop
+  - platform: template
+    id: btn_stop
+    name: "Stop Conveyor"
+    icon: mdi:stop-circle
+    entity_category: config
+    on_press:
+      - script.stop: run_conveyor
+      - lambda: |-
+          id(yellow_flash_active) = false;
+          id(yellow_led_state) = false;
+      - output.turn_off: out_motor_en
+      - output.turn_off: out_motor_in1
+      - output.turn_off: out_motor_in2
+      - binary_sensor.template.publish:
+          id: conveyor_running
+          state: false
+      - output.turn_off: out_led_red
+      - output.turn_off: out_led_yellow
+      - output.turn_off: out_led_green
