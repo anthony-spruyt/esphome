@@ -146,12 +146,14 @@ interval:
                 id(yellow_led_state) = !id(yellow_led_state);
                 id(out_led_yellow).set_state(id(yellow_led_state));
 
-# ------- Conveyor run script ------- #
-# Sequence: wait (yellow flashing) → run motor (red) → cooldown (green)
+# ------- Conveyor scripts ------- #
+# run_conveyor: covers wait + motor run only (mode: single blocks re-entry here)
+# conveyor_cooldown: runs after motor stops — new purge triggers are held off
+#                   until cooldown completes, but run_conveyor is free to queue
 
 script:
   - id: run_conveyor
-    mode: single # Drop new triggers while a cycle is already running
+    mode: single # Blocks re-entry during wait + motor run only
     then:
       # Waiting phase: yellow flashes, green off, red off
       - output.turn_off: out_led_green
@@ -183,18 +185,20 @@ script:
 
       - delay: !lambda "return (uint32_t)(id(cfg_run_time).state * 1000);"
 
-      # Stop motor
+      # Stop motor, hand off to cooldown script (non-blocking)
       - output.turn_off: out_motor_en
       - output.turn_off: out_motor_in1
       - output.turn_off: out_motor_in2
       - binary_sensor.template.publish:
           id: conveyor_running
           state: false
+      - script.execute: conveyor_cooldown
 
-      # Cooldown phase: green on, no re-trigger allowed
+  - id: conveyor_cooldown
+    mode: single # Blocks re-trigger during cooldown window
+    then:
       - output.turn_off: out_led_red
       - output.turn_on: out_led_green
-
       - delay: !lambda "return (uint32_t)(id(cfg_cooldown).state * 1000);"
       # Cooldown done — back to idle (green stays on)
 
@@ -223,16 +227,34 @@ binary_sensor:
     on_press:
       - if:
           condition:
-            not:
-              script.is_running: run_conveyor
+            and:
+              - not:
+                  script.is_running: run_conveyor
+              - not:
+                  script.is_running: conveyor_cooldown
           then:
             - script.execute: run_conveyor
 
-# Auto-trigger from HA Bambu integration (bambu_stage_entity set in top-level config)
-# The Bambu HA integration exposes current_stage as a text sensor, so we use
-# text_sensor homeassistant platform and match on the string values.
-# Triggers on: "Cleaning nozzle tip" (purge) and "Changing filament"
+  # Primary AMS trigger: goes true on every mid-print filament swap.
+  # More reliable than current_stage which HA misses due to rapid transitions.
+  - platform: homeassistant
+    id: bambu_ams_active
+    entity_id: ${bambu_ams_active_entity}
+    on_press:
+      - logger.log: "AMS active: filament swap detected"
+      - if:
+          condition:
+            and:
+              - not:
+                  script.is_running: run_conveyor
+              - not:
+                  script.is_running: conveyor_cooldown
+          then:
+            - script.execute: run_conveyor
+
 text_sensor:
+  # Secondary trigger: catches the initial start-of-print nozzle clean
+  # (no AMS swap occurs then, so active_tray won't change).
   - platform: homeassistant
     id: bambu_print_stage
     entity_id: ${bambu_stage_entity}
@@ -240,10 +262,11 @@ text_sensor:
       - if:
           condition:
             and:
-              - lambda: |-
-                  return x == "cleaning_nozzle_tip" || x == "changing_filament";
+              - lambda: 'return x == "cleaning_nozzle_tip";'
               - not:
                   script.is_running: run_conveyor
+              - not:
+                  script.is_running: conveyor_cooldown
           then:
             - script.execute: run_conveyor
 
@@ -258,8 +281,11 @@ button:
     on_press:
       - if:
           condition:
-            not:
-              script.is_running: run_conveyor
+            and:
+              - not:
+                  script.is_running: run_conveyor
+              - not:
+                  script.is_running: conveyor_cooldown
           then:
             - script.execute: run_conveyor
 
@@ -271,6 +297,7 @@ button:
     entity_category: config
     on_press:
       - script.stop: run_conveyor
+      - script.stop: conveyor_cooldown
       - lambda: |-
           id(yellow_flash_active) = false;
           id(yellow_led_state) = false;

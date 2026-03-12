@@ -19,3 +19,4 @@ packages:
 # auto-triggering (see device package for details):
 substitutions:
   bambu_stage_entity: sensor.x1c_00m09d481300719_current_stage
+  bambu_ams_active_entity: binary_sensor.x1c_00m09d481300719_ams_1_active
