@@ -1,0 +1,5 @@
+i2c:
+  - id: i2c_bus
+    sda: ${i2c_sda}
+    scl: ${i2c_scl}
+    scan: true

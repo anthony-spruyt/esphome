@@ -3,7 +3,13 @@
     "allow": [
       "WebFetch(domain:esphome.io)",
       "Bash(gh pr view:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(ls:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(find /workspaces/esphome/config/packages -name \"*.yaml\" 2>/dev/null | grep -v \".esphome\" | head -30)",
+      "Bash(git commit:*)",
+      "Bash(git add:*)"
     ]
   }
 }

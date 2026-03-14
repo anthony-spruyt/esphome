@@ -3,7 +3,7 @@ packages:
   bt: !include ../common/.bt.yaml
   i2c: !include ../components/.i2c.yaml
   bh1750: !include ../components/.bh1750.yaml
-
+  aht20-bmp280: !include ../components/.aht20-bmp280.yaml
 esp32:
   framework:
     type: esp-idf

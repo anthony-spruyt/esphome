@@ -1,0 +1,24 @@
+packages:
+  #wifi: !include packages/common/.wifi-iot.yaml
+  wifi: !include packages/common/.wifi-garage-iot.yaml
+  captive_portal:
+    !include {
+      file: packages/common/.captive-portal.yaml,
+      vars: { device_name: garage-luminance-and-temp },
+    }
+  device:
+    !include {
+      file: packages/devices/.luminance-and-temp.yaml,
+      vars:
+        {
+          device_name: garage-luminance-and-temp,
+          device_friendly_name: garage-luminance-and-temp,
+          i2c_sda: 21,
+          i2c_scl: 22,
+          bh1750_address: 0x23,
+          aht20_address: 0x38,
+          bmp280_address: 0x77,
+          update_interval: 30s,
+        },
+    }
+  debug-log: !include { file: packages/debug/.log.yaml }

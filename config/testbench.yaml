@@ -1,0 +1,18 @@
+substitutions:
+  device_name: testbench
+  device_friendly_name: testbench
+
+packages:
+  wifi: !include packages/common/.wifi-iot.yaml
+  board: !include packages/boards/.dev.yaml
+  i2c:
+    !include {
+      file: packages/components/.i2c.yaml,
+      vars: { i2c_sda: GPIO21, i2c_scl: GPIO22 },
+    }
+  aht20-bmp280:
+    !include {
+      file: packages/components/.aht20-bmp280.yaml,
+      vars: { aht20_address: 0x38, bmp280_address: 0x77, update_interval: 60s },
+    }
+  debug-log: !include { file: packages/debug/.log.yaml }

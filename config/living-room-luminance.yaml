@@ -14,7 +14,7 @@ packages:
           device_friendly_name: living-room-luminance,
           i2c_sda: 21,
           i2c_scl: 22,
-          i2c_address: 0x23,
+          bh1750_address: 0x23,
           update_interval: 30s,
         },
     }
