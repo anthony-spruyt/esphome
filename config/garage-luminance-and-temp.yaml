@@ -21,4 +21,4 @@ packages:
           update_interval: 30s,
         },
     }
-  debug-log: !include { file: packages/debug/.log.yaml }
+  #debug-log: !include { file: packages/debug/.log.yaml }
