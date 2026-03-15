@@ -1,5 +1,10 @@
 packages:
   board: !include ../boards/.dev.yaml
+  i2c:
+    !include {
+      file: ../components/.i2c.yaml,
+      vars: { i2c_sda: 21, i2c_scl: 22 },
+    }
   aht20-bmp280:
     !include {
       file: ../components/.aht20-bmp280.yaml,
@@ -10,6 +15,8 @@ packages:
           aht20_address: 0x38,
           bmp280_address: 0x77,
           update_interval: 60s,
+          aht20_temp_offset: "-1.46",
+          bmp280_temp_offset: "-1.5",
         },
     }
   one-wire: !include { file: ../common/.one-wire.yaml, vars: { pin: GPIO4 } }

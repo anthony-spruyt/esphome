@@ -1,3 +1,7 @@
+substitutions:
+  aht20_temp_offset: "0"
+  bmp280_temp_offset: "0"
+
 sensor:
   - platform: aht10
     variant: AHT20
@@ -5,6 +9,8 @@ sensor:
     address: ${aht20_address}
     temperature:
       name: "AHT20 Temperature"
+      filters:
+        - offset: ${aht20_temp_offset}
     humidity:
       name: "AHT20 Humidity"
     update_interval: ${update_interval}
@@ -13,6 +19,8 @@ sensor:
     address: ${bmp280_address}
     temperature:
       name: "BMP280 Temperature"
+      filters:
+        - offset: ${bmp280_temp_offset}
     pressure:
       name: "BMP280 Pressure"
     update_interval: ${update_interval}

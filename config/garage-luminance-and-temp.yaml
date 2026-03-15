@@ -19,6 +19,8 @@ packages:
           aht20_address: 0x38,
           bmp280_address: 0x77,
           update_interval: 30s,
+          aht20_temp_offset: "-7.86",
+          bmp280_temp_offset: "-8.2",
         },
     }
   #debug-log: !include { file: packages/debug/.log.yaml }
