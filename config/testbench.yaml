@@ -6,7 +6,7 @@ packages:
   wifi: !include packages/common/.wifi-iot.yaml
   vent-controller:
     !include {
-      file: packages/devices/.x1c-chamber-vent-controller.yaml,
+      file: packages/devices/.chamber-vent-controller.yaml,
       vars:
         {
           device_name: testbench,
