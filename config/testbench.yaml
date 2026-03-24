@@ -4,15 +4,17 @@ substitutions:
 
 packages:
   wifi: !include packages/common/.wifi-iot.yaml
-  board: !include packages/boards/.dev.yaml
-  i2c:
+  vent-controller:
     !include {
-      file: packages/components/.i2c.yaml,
-      vars: { i2c_sda: GPIO21, i2c_scl: GPIO22 },
-    }
-  aht20-bmp280:
-    !include {
-      file: packages/components/.aht20-bmp280.yaml,
-      vars: { aht20_address: 0x38, bmp280_address: 0x77, update_interval: 60s },
+      file: packages/devices/.x1c-chamber-vent-controller.yaml,
+      vars:
+        {
+          device_name: testbench,
+          device_friendly_name: testbench,
+          motor_a_in1: GPIO16,
+          motor_a_in2: GPIO17,
+          motor_b_in3: GPIO18,
+          motor_b_in4: GPIO19,
+        },
     }
   debug-log: !include { file: packages/debug/.log.yaml }

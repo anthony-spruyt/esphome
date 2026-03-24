@@ -1,0 +1,154 @@
+# Chamber Riser Vent Controller - ESPHome Device Package
+#
+# Hardware: L298N H-bridge + ESP32 WROOM-32D + 2x 21mm linear actuators
+# Purpose: Open/close cooling vents on X1C chamber riser (MakerWorld #495269)
+#
+# L298N wiring (ENA/ENB jumpers ON for full speed):
+#   IN1 -> ${motor_a_in1}, IN2 -> ${motor_a_in2}  (Motor A - actuator 1)
+#   IN3 -> ${motor_b_in3}, IN4 -> ${motor_b_in4}  (Motor B - actuator 2)
+#   12V -> external PSU, 5V -> ESP32 VIN, GND -> shared
+#
+# Actuators have internal limit switches — they self-stop at full
+# extension/retraction. The motor timeout is just a safety cutoff.
+# Motor B runs reversed to compensate for opposite mounting orientation.
+#
+# Both actuators move in sync as a single ESPHome cover entity.
+#
+# Required substitutions:
+#   device_name, device_friendly_name
+#   motor_a_in1, motor_a_in2, motor_b_in3, motor_b_in4
+
+packages:
+  board: !include ../boards/.dev.yaml
+
+esp32:
+  framework:
+    type: esp-idf
+    advanced:
+      minimum_chip_revision: "3.1"
+
+# ------- Motor direction outputs ------- #
+
+output:
+  - platform: gpio
+    id: out_motor_a_in1
+    pin: ${motor_a_in1}
+
+  - platform: gpio
+    id: out_motor_a_in2
+    pin: ${motor_a_in2}
+
+  - platform: gpio
+    id: out_motor_b_in3
+    pin: ${motor_b_in3}
+
+  - platform: gpio
+    id: out_motor_b_in4
+    pin: ${motor_b_in4}
+
+# ------- Motor safety timeout ------- #
+# Actuators have internal limit switches so they stop themselves.
+# This timeout is a safety cutoff — set it longer than actual travel time.
+
+number:
+  - platform: template
+    id: cfg_motor_timeout
+    name: "Motor Safety Timeout"
+    icon: mdi:timer-alert
+    unit_of_measurement: "s"
+    min_value: 1
+    max_value: 30
+    step: 1
+    initial_value: 6
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+# ------- Vent cover ------- #
+
+cover:
+  - platform: template
+    id: chamber_vents
+    name: "Chamber Vents"
+    device_class: damper
+    has_position: false
+    lambda: "return {};"
+    open_action:
+      - script.execute: script_open_vents
+    close_action:
+      - script.execute: script_close_vents
+    stop_action:
+      - script.execute: script_stop_motors
+
+# ------- Scripts ------- #
+
+script:
+  - id: script_open_vents
+    mode: restart
+    then:
+      - logger.log: "Opening vents"
+      # Motor A forward
+      - output.turn_on: out_motor_a_in1
+      - output.turn_off: out_motor_a_in2
+      # Motor B reversed (opposite mounting orientation)
+      - output.turn_off: out_motor_b_in3
+      - output.turn_on: out_motor_b_in4
+      - delay: !lambda "return (uint32_t)(id(cfg_motor_timeout).state * 1000);"
+      - script.execute: script_stop_motors
+      - cover.template.publish:
+          id: chamber_vents
+          state: OPEN
+          current_operation: IDLE
+
+  - id: script_close_vents
+    mode: restart
+    then:
+      - logger.log: "Closing vents"
+      # Motor A reverse
+      - output.turn_off: out_motor_a_in1
+      - output.turn_on: out_motor_a_in2
+      # Motor B reversed (opposite mounting orientation)
+      - output.turn_on: out_motor_b_in3
+      - output.turn_off: out_motor_b_in4
+      - delay: !lambda "return (uint32_t)(id(cfg_motor_timeout).state * 1000);"
+      - script.execute: script_stop_motors
+      - cover.template.publish:
+          id: chamber_vents
+          state: CLOSED
+          current_operation: IDLE
+
+  - id: script_stop_motors
+    mode: restart
+    then:
+      - output.turn_off: out_motor_a_in1
+      - output.turn_off: out_motor_a_in2
+      - output.turn_off: out_motor_b_in3
+      - output.turn_off: out_motor_b_in4
+      - cover.template.publish:
+          id: chamber_vents
+          current_operation: IDLE
+
+# ------- Buttons ------- #
+
+button:
+  - platform: template
+    id: btn_open_vents
+    name: "Open Vents"
+    icon: mdi:arrow-expand-vertical
+    on_press:
+      - cover.open: chamber_vents
+
+  - platform: template
+    id: btn_close_vents
+    name: "Close Vents"
+    icon: mdi:arrow-collapse-vertical
+    on_press:
+      - cover.close: chamber_vents
+
+  - platform: template
+    id: btn_stop
+    name: "Stop Vents"
+    icon: mdi:stop-circle
+    entity_category: config
+    on_press:
+      - cover.stop: chamber_vents
