@@ -1,7 +1,3 @@
-substitutions:
-  device_name: testbench
-  device_friendly_name: testbench
-
 packages:
   wifi: !include packages/common/.wifi-iot.yaml
   vent-controller:

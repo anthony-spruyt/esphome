@@ -1,0 +1,20 @@
+packages:
+  wifi: !include packages/common/.wifi-garage-iot.yaml
+  captive_portal:
+    !include {
+      file: packages/common/.captive-portal.yaml,
+      vars: { device_name: x1c-chamber-vent-controller },
+    }
+  device:
+    !include {
+      file: packages/devices/.chamber-vent-controller.yaml,
+      vars:
+        {
+          device_name: x1c-chamber-vent-controller,
+          device_friendly_name: X1C Chamber Vent Controller,
+          motor_a_in1: GPIO16,
+          motor_a_in2: GPIO17,
+          motor_b_in3: GPIO18,
+          motor_b_in4: GPIO19,
+        },
+    }
