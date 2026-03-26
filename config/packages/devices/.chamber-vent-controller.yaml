@@ -87,12 +87,12 @@ script:
     mode: restart
     then:
       - logger.log: "Opening vents"
-      # Motor A forward
-      - output.turn_on: out_motor_a_in1
-      - output.turn_off: out_motor_a_in2
+      # Motor A reverse
+      - output.turn_off: out_motor_a_in1
+      - output.turn_on: out_motor_a_in2
       # Motor B reversed (opposite mounting orientation)
-      - output.turn_off: out_motor_b_in3
-      - output.turn_on: out_motor_b_in4
+      - output.turn_on: out_motor_b_in3
+      - output.turn_off: out_motor_b_in4
       - delay: !lambda "return (uint32_t)(id(cfg_motor_timeout).state * 1000);"
       - script.execute: script_stop_motors
       - cover.template.publish:
@@ -104,12 +104,12 @@ script:
     mode: restart
     then:
       - logger.log: "Closing vents"
-      # Motor A reverse
-      - output.turn_off: out_motor_a_in1
-      - output.turn_on: out_motor_a_in2
+      # Motor A forward
+      - output.turn_on: out_motor_a_in1
+      - output.turn_off: out_motor_a_in2
       # Motor B reversed (opposite mounting orientation)
-      - output.turn_on: out_motor_b_in3
-      - output.turn_off: out_motor_b_in4
+      - output.turn_off: out_motor_b_in3
+      - output.turn_on: out_motor_b_in4
       - delay: !lambda "return (uint32_t)(id(cfg_motor_timeout).state * 1000);"
       - script.execute: script_stop_motors
       - cover.template.publish:
