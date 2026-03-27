@@ -5,8 +5,6 @@
 #   IN1 -> GPIO23, IN2 -> GPIO21, EN (PWM) -> GPIO15
 # LEDs (with 470Ω resistors):
 #   Green -> GPIO19, Yellow -> GPIO18, Red -> GPIO4
-# Motion sensor (optional PIR):
-#   OUT -> GPIO22
 #
 # Trigger via Home Assistant:
 #   Option A (recommended): Create an HA automation that calls button.press
@@ -18,8 +16,11 @@
 # Required substitutions (from top-level config):
 #   device_name, device_friendly_name
 # Optional substitutions:
-#   bambu_stage_entity  - HA entity_id of numeric Bambu print stage sensor
-#                         (leave as "sensor.disabled" to skip auto-trigger)
+#   bambu_stage_entity        - HA entity_id of Bambu print stage sensor
+#                               (leave as "sensor.disabled" to skip auto-trigger)
+#   bambu_print_status_entity - HA entity_id of Bambu print status sensor
+#                               (e.g. "running", "idle", "finish", "prepare")
+#                               LEDs stay off when printer is not actively printing
 
 packages:
   board: !include ../boards/.dev.yaml
@@ -34,7 +35,10 @@ esphome:
   on_boot:
     priority: -100 # Run after all components are initialised
     then:
-      - output.turn_on: out_led_green
+      # LEDs start off; green turns on only when printer is actively printing
+      - output.turn_off: out_led_green
+      - output.turn_off: out_led_yellow
+      - output.turn_off: out_led_red
 
 # ------- Motor timing & direction (configurable from HA) ------- #
 
@@ -133,6 +137,10 @@ globals:
     type: bool
     restore_value: false
     initial_value: "false"
+  - id: printer_active
+    type: bool
+    restore_value: false
+    initial_value: "false"
 
 # Flashes yellow LED every 500ms while waiting (matches original firmware behaviour)
 interval:
@@ -198,9 +206,14 @@ script:
     mode: single # Blocks re-trigger during cooldown window
     then:
       - output.turn_off: out_led_red
-      - output.turn_on: out_led_green
+      # Only show green if printer is actively printing
+      - if:
+          condition:
+            lambda: "return id(printer_active);"
+          then:
+            - output.turn_on: out_led_green
       - delay: !lambda "return (uint32_t)(id(cfg_cooldown).state * 1000);"
-      # Cooldown done — back to idle (green stays on)
+      # Cooldown done — green stays on only if printer is still active
 
 # ------- Sensors ------- #
 
@@ -210,30 +223,6 @@ binary_sensor:
     id: conveyor_running
     name: "Conveyor Running"
     device_class: running
-
-  # Optional PIR motion sensor (AM312 or similar, active-high)
-  # Wire: VCC=3.3V, GND=GND, OUT=GPIO22
-  - platform: gpio
-    pin:
-      number: GPIO22
-      mode:
-        input: true
-        pulldown: true
-    id: pir_sensor
-    name: "Motion Sensor"
-    device_class: motion
-    filters:
-      - delayed_off: 2s
-    on_press:
-      - if:
-          condition:
-            and:
-              - not:
-                  script.is_running: run_conveyor
-              - not:
-                  script.is_running: conveyor_cooldown
-          then:
-            - script.execute: run_conveyor
 
   # Primary AMS trigger: goes true on every mid-print filament swap.
   # More reliable than current_stage which HA misses due to rapid transitions.
@@ -253,6 +242,38 @@ binary_sensor:
             - script.execute: run_conveyor
 
 text_sensor:
+  # Printer status: controls whether LEDs are active at all.
+  # When printer is not actively printing, all LEDs stay off.
+  - platform: homeassistant
+    id: bambu_print_status
+    entity_id: ${bambu_print_status_entity}
+    on_value:
+      - lambda: |-
+          bool was_active = id(printer_active);
+          // "running" and "prepare" are active printing states
+          bool now_active = (x == "running" || x == "prepare");
+          id(printer_active) = now_active;
+
+          if (now_active && !was_active) {
+            // Printer started: show green idle LED (if conveyor isn't mid-run)
+            if (!id(run_conveyor).is_running()) {
+              id(out_led_green).turn_on();
+            }
+          } else if (!now_active && was_active) {
+            // Printer stopped: kill everything and go dark
+            id(run_conveyor).stop();
+            id(conveyor_cooldown).stop();
+            id(yellow_flash_active) = false;
+            id(yellow_led_state) = false;
+            id(out_motor_en).set_level(0);
+            id(out_motor_in1).turn_off();
+            id(out_motor_in2).turn_off();
+            id(conveyor_running).publish_state(false);
+            id(out_led_green).turn_off();
+            id(out_led_yellow).turn_off();
+            id(out_led_red).turn_off();
+          }
+
   # Secondary trigger: catches the initial start-of-print nozzle clean
   # (no AMS swap occurs then, so active_tray won't change).
   - platform: homeassistant
@@ -309,4 +330,11 @@ button:
           state: false
       - output.turn_off: out_led_red
       - output.turn_off: out_led_yellow
-      - output.turn_on: out_led_green
+      # Only show green if printer is actively printing
+      - if:
+          condition:
+            lambda: "return id(printer_active);"
+          then:
+            - output.turn_on: out_led_green
+          else:
+            - output.turn_off: out_led_green
