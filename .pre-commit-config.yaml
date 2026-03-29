@@ -18,6 +18,30 @@ repos:
           - "--markdown-linebreak-ext=md"
       - id: "end-of-file-fixer"
       - id: "mixed-line-ending"
+  - repo: "https://github.com/sirosen/texthooks"
+    rev: "0.7.1"
+    hooks:
+      - id: "fix-smartquotes"
+      - id: "fix-ligatures"
+  - repo: "https://github.com/zricethezav/gitleaks"
+    rev: "v8.30.1"
+    hooks:
+      - id: "gitleaks"
+        args:
+          - "--config"
+          - ".gitleaks.toml"
+  - repo: "https://github.com/shellcheck-py/shellcheck-py"
+    rev: "v0.11.0.1"
+    hooks:
+      - id: "shellcheck"
+  - repo: "https://github.com/scop/pre-commit-shfmt"
+    rev: "v3.12.0-2"
+    hooks:
+      - id: "shfmt"
+  - repo: "https://github.com/igorshubovych/markdownlint-cli"
+    rev: "v0.48.0"
+    hooks:
+      - id: "markdownlint"
   - repo: "https://github.com/Lucas-C/pre-commit-hooks"
     rev: "v1.5.6"
     hooks:
@@ -26,26 +50,3 @@ repos:
         args:
           - "--whitespaces-count"
           - "2"
-  - repo: "https://github.com/sirosen/texthooks"
-    rev: "0.7.1"
-    hooks:
-      - id: "fix-smartquotes"
-      - id: "fix-ligatures"
-  - repo: "https://github.com/zricethezav/gitleaks"
-    rev: "v8.30.0"
-    hooks:
-      - id: "gitleaks"
-        args:
-          - "--config"
-          - ".gitleaks.toml"
-  - repo: "local"
-    hooks:
-      - id: "prettier"
-        name: "prettier"
-        entry: "npx prettier --write --config=.prettierrc.yaml
-          --ignore-path=.prettierignore"
-        language: "system"
-        types_or:
-          - "json"
-          - "yaml"
-          - "markdown"
