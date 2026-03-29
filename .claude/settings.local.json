@@ -10,6 +10,10 @@
       "Bash(find /workspaces/esphome/config/packages -name \"*.yaml\" 2>/dev/null | grep -v \".esphome\" | head -30)",
       "Bash(git commit:*)",
       "Bash(git add:*)"
+    ],
+    "deny": [
+      "Read(./**/secrets.yaml)",
+      "Grep(path:**/secrets.yaml)"
     ]
   }
 }
