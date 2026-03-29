@@ -1,15 +1,14 @@
 {
-  "files.associations": {
-    "*.yaml": "esphome"
-  },
-  "esphome.dashboard.url": "http://http://localhost:6052",
-  "yaml.schemas": {
-    "https://raw.githubusercontent.com/esphome/esphome/main/esphome/schemas/configuration.json": "*.yaml"
-  },
   "files.exclude": {
-    "build/**": true,
-    "config/.esphome/**": true,
-    "**/.gitignore": true
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "agent.sock": true
+  },
+  "search.exclude": {
+    "**/node_modules": true
   },
   "search.useIgnoreFiles": false,
   "search.useGlobalIgnoreFiles": false,
@@ -19,5 +18,12 @@
   "editor.codeActions.triggerOnFocusChange": false,
   "explorer.sortOrder": "type",
   "editor.tabSize": 2,
-  "chat.agent.enabled": false
+  "chat.agent.enabled": false,
+  "files.associations": {
+    "*.yaml": "esphome"
+  },
+  "esphome.dashboard.url": "http://localhost:6052",
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/esphome/esphome/main/esphome/schemas/configuration.json": "*.yaml"
+  }
 }
