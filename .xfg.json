@@ -1,0 +1,26 @@
+{
+  "version": 4,
+  "configs": {
+    "repo-operator": {
+      "files": [
+        ".devcontainer/devcontainer.json",
+        ".devcontainer/initialize.sh",
+        ".devcontainer/package.json",
+        ".devcontainer/post-create.sh",
+        ".devcontainer/setup-devcontainer.sh",
+        ".editorconfig",
+        ".gitignore",
+        ".gitleaks.toml",
+        ".jsonlintrc",
+        ".markdownlint.json",
+        ".markdownlintignore",
+        ".pre-commit-config.yaml",
+        ".prettierignore",
+        ".prettierrc.yaml",
+        ".vscode/settings.json",
+        ".yamllint.yml",
+        "LICENSE"
+      ]
+    }
+  }
+}
