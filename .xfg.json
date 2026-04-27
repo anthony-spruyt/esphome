@@ -17,6 +17,7 @@
         ".markdownlint.json",
         ".markdownlintignore",
         ".mdformat.toml",
+        ".mergify.yml",
         ".pre-commit-config.yaml",
         ".prettierignore",
         ".prettierrc.yaml",
