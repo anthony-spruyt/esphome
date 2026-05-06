@@ -10,7 +10,6 @@
         ".devcontainer/README.md",
         ".devcontainer/setup-devcontainer.sh",
         ".editorconfig",
-        ".github/renovate-overrides.json5",
         ".github/renovate.json5",
         ".gitignore",
         ".gitleaks.toml",
