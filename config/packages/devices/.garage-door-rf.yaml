@@ -6,12 +6,12 @@
 # CC1101 V2.0 blue board wiring (2x4 header, antenna at top):
 #   Pin 1 (GND)  -> GND
 #   Pin 2 (VCC)  -> 3.3V (NOT 5V)
-#   Pin 3 (GDO0) -> ${cc1101_gdo0}  (TX/RX data)
+#   Pin 3 (GDO0) -> ${cc1101_gdo0}  (TX data)
 #   Pin 4 (CSN)  -> ${cc1101_cs}
 #   Pin 5 (SCK)  -> ${spi_clk}
 #   Pin 6 (MOSI) -> ${spi_mosi}
 #   Pin 7 (MISO) -> ${spi_miso}
-#   Pin 8 (GDO2) -> ${cc1101_gdo2}  (unused)
+#   Pin 8 (GDO2) -> ${cc1101_gdo2}  (RX data)
 #
 # Usage:
 #   1. Flash and boot — receiver starts automatically at 303.875 MHz
@@ -56,14 +56,7 @@ cc1101:
   output_power: 10
 
 remote_receiver:
-  pin:
-    number: ${cc1101_gdo0}
-    mode:
-      input: true
-      output: true
-      pullup: true
-      open_drain: true
-    allow_other_uses: true
+  pin: ${cc1101_gdo2}
   dump: raw
   tolerance: 50%
   filter: 150us
@@ -73,26 +66,14 @@ remote_receiver:
 remote_transmitter:
   pin:
     number: ${cc1101_gdo0}
-    mode:
-      input: true
-      output: true
-      pullup: true
-      open_drain: true
     allow_other_uses: true
   carrier_duty_percent: 100%
-  eot_level: false
-  non_blocking: false
   on_transmit:
     then:
-      - logger.log: "CC1101 switching to TX mode"
-      - cc1101.set_idle: rf_transceiver
-      - remote_transmitter.digital_write: false
       - cc1101.begin_tx: rf_transceiver
   on_complete:
     then:
-      - logger.log: "TX complete"
       - cc1101.set_idle: rf_transceiver
-      - remote_transmitter.digital_write: true
       - if:
           condition:
             lambda: "return id(rx_active);"
