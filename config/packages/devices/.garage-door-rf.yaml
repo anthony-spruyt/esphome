@@ -1,7 +1,7 @@
 # Garage Door RF Controller — Boss BRD1 via CC1101 at 303 MHz
 #
 # Hardware: ESP32 WROOM-32D + CC1101 RF Transceiver (SMA antenna)
-# Protocol: Fixed-code OOK/ASK at 303 MHz
+# Protocol: Fixed-code OOK/ASK at 305 MHz (crystal R305)
 #
 # CC1101 wiring:
 #   VCC  -> 3.3V (NOT 5V)
@@ -40,7 +40,7 @@ spi:
 cc1101:
   id: rf_transceiver
   cs_pin: ${cc1101_cs}
-  frequency: 303MHz
+  frequency: 305MHz
   modulation_type: ASK/OOK
   symbol_rate: 5000
   filter_bandwidth: 203kHz
