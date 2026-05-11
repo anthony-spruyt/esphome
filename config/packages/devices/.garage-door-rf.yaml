@@ -1,0 +1,114 @@
+# Garage Door RF Controller — Boss BRD1 via CC1101 at 303 MHz
+#
+# Hardware: ESP32 WROOM-32D + CC1101 RF Transceiver (SMA antenna)
+# Protocol: Fixed-code OOK/ASK at 303 MHz
+#
+# CC1101 wiring:
+#   VCC  -> 3.3V (NOT 5V)
+#   GND  -> GND
+#   SCK  -> ${spi_clk}
+#   MOSI -> ${spi_mosi}
+#   MISO -> ${spi_miso}
+#   CSN  -> ${cc1101_cs}
+#   GDO0 -> ${cc1101_gdo0}  (TX data)
+#   GDO2 -> ${cc1101_gdo2}  (RX data)
+#
+# Usage:
+#   1. Flash and boot — receiver starts automatically
+#   2. Press your Boss remote near the ESP32 antenna
+#   3. Check logs for raw code dump
+#   4. Copy raw code into garage_door_code below
+#   5. Re-flash — garage door button appears in Home Assistant
+#
+# Required substitutions:
+#   device_name, device_friendly_name
+#   cc1101_cs, cc1101_gdo0, cc1101_gdo2
+#   spi_clk, spi_mosi, spi_miso
+
+packages:
+  board: !include ../boards/.dev.yaml
+
+esp32:
+  framework:
+    type: esp-idf
+
+spi:
+  clk_pin: ${spi_clk}
+  mosi_pin: ${spi_mosi}
+  miso_pin: ${spi_miso}
+
+cc1101:
+  id: rf_transceiver
+  cs_pin: ${cc1101_cs}
+  frequency: 303MHz
+  modulation_type: ASK/OOK
+  symbol_rate: 5000
+  filter_bandwidth: 203kHz
+  output_power: 10
+
+remote_receiver:
+  pin: ${cc1101_gdo2}
+  dump: raw
+  tolerance: 50%
+  filter: 100us
+  idle: 4ms
+  buffer_size: 2048b
+  on_raw:
+    then:
+      - logger.log:
+          level: INFO
+          format: "Received raw RF signal — copy this code for replay"
+
+remote_transmitter:
+  pin: ${cc1101_gdo0}
+  carrier_duty_percent: 100%
+  on_transmit:
+    then:
+      - cc1101.begin_tx: rf_transceiver
+  on_complete:
+    then:
+      - cc1101.begin_rx: rf_transceiver
+
+cover:
+  - platform: template
+    id: garage_door
+    name: "Garage Door"
+    device_class: garage
+    has_position: false
+    lambda: "return {};"
+    open_action:
+      - script.execute: script_send_rf
+    close_action:
+      - script.execute: script_send_rf
+    stop_action: []
+
+script:
+  - id: script_send_rf
+    mode: single
+    then:
+      - logger.log: "Sending garage door RF signal"
+      # Uncomment and paste your captured raw code here:
+      # - remote_transmitter.transmit_raw:
+      #     code: [990, -330, 330, -990, ...]  # <-- your captured code
+      #     repeat:
+      #       times: 5
+      #       wait_time: 5ms
+
+button:
+  - platform: template
+    id: btn_send_rf
+    name: "Garage Door Toggle"
+    icon: mdi:garage
+    on_press:
+      - script.execute: script_send_rf
+
+  - platform: template
+    id: btn_scan_rf
+    name: "Start RF Scan"
+    icon: mdi:antenna
+    entity_category: diagnostic
+    on_press:
+      - logger.log:
+          level: INFO
+          format: "RF scan active — press your remote now"
+      - cc1101.begin_rx: rf_transceiver

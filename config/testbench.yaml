@@ -1,16 +1,18 @@
 packages:
   wifi: !include packages/common/.wifi-iot.yaml
-  vent-controller:
+  garage-door:
     !include {
-      file: packages/devices/.chamber-vent-controller.yaml,
+      file: packages/devices/.garage-door-rf.yaml,
       vars:
         {
           device_name: testbench,
-          device_friendly_name: testbench,
-          motor_a_in1: GPIO16,
-          motor_a_in2: GPIO17,
-          motor_b_in3: GPIO18,
-          motor_b_in4: GPIO19,
+          device_friendly_name: Testbench,
+          cc1101_cs: GPIO5,
+          cc1101_gdo0: GPIO4,
+          cc1101_gdo2: GPIO16,
+          spi_clk: GPIO18,
+          spi_mosi: GPIO23,
+          spi_miso: GPIO19,
         },
     }
   debug-log: !include { file: packages/debug/.log.yaml }
