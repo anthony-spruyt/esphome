@@ -1,24 +1,24 @@
-# Garage Door RF Controller — Boss BRD1 via CC1101 at 303 MHz
+# Garage Door RF Controller — Boss BRD1 via CC1101
 #
 # Hardware: ESP32 WROOM-32D + CC1101 RF Transceiver (SMA antenna)
-# Protocol: Fixed-code OOK/ASK at 305 MHz (crystal R305)
+# Protocol: Fixed-code OOK/ASK (frequency TBD — use RF Frequency slider to find it)
 #
-# CC1101 wiring:
-#   VCC  -> 3.3V (NOT 5V)
-#   GND  -> GND
-#   SCK  -> ${spi_clk}
-#   MOSI -> ${spi_mosi}
-#   MISO -> ${spi_miso}
-#   CSN  -> ${cc1101_cs}
-#   GDO0 -> ${cc1101_gdo0}  (TX data)
-#   GDO2 -> ${cc1101_gdo2}  (RX data)
+# CC1101 V2.0 blue board wiring (2x4 header, antenna at top):
+#   Pin 1 (GND)  -> GND
+#   Pin 2 (VCC)  -> 3.3V (NOT 5V)
+#   Pin 3 (GDO0) -> ${cc1101_gdo0}  (TX/RX data)
+#   Pin 4 (CSN)  -> ${cc1101_cs}
+#   Pin 5 (SCK)  -> ${spi_clk}
+#   Pin 6 (MOSI) -> ${spi_mosi}
+#   Pin 7 (MISO) -> ${spi_miso}
+#   Pin 8 (GDO2) -> ${cc1101_gdo2}  (unused)
 #
 # Usage:
-#   1. Flash and boot — receiver starts automatically
-#   2. Press your Boss remote near the ESP32 antenna
-#   3. Check logs for raw code dump
-#   4. Copy raw code into garage_door_code below
-#   5. Re-flash — garage door button appears in Home Assistant
+#   1. Flash and boot — receiver starts automatically at 303.875 MHz
+#   2. Use "RF Frequency" slider in HA to sweep frequencies
+#   3. Press remote while watching logs — look for repeating pattern
+#   4. Once found, copy raw code into script_send_rf below
+#   5. Re-flash with final frequency hardcoded
 #
 # Required substitutions:
 #   device_name, device_friendly_name
@@ -27,6 +27,12 @@
 
 packages:
   board: !include ../boards/.dev.yaml
+
+esphome:
+  on_boot:
+    priority: -100
+    then:
+      - cc1101.set_idle: rf_transceiver
 
 esp32:
   framework:
@@ -40,59 +46,155 @@ spi:
 cc1101:
   id: rf_transceiver
   cs_pin: ${cc1101_cs}
-  frequency: 305MHz
+  gdo0_pin:
+    number: ${cc1101_gdo0}
+    allow_other_uses: true
+  frequency: 303MHz
   modulation_type: ASK/OOK
   symbol_rate: 5000
   filter_bandwidth: 203kHz
   output_power: 10
 
 remote_receiver:
-  pin: ${cc1101_gdo2}
+  pin:
+    number: ${cc1101_gdo0}
+    mode:
+      input: true
+      output: true
+      pullup: true
+      open_drain: true
+    allow_other_uses: true
   dump: raw
   tolerance: 50%
-  filter: 100us
-  idle: 4ms
-  buffer_size: 2048b
-  on_raw:
-    then:
-      - logger.log:
-          level: INFO
-          format: "Received raw RF signal — copy this code for replay"
+  filter: 150us
+  idle: 10ms
+  buffer_size: 4096b
 
 remote_transmitter:
-  pin: ${cc1101_gdo0}
+  pin:
+    number: ${cc1101_gdo0}
+    mode:
+      input: true
+      output: true
+      pullup: true
+      open_drain: true
+    allow_other_uses: true
   carrier_duty_percent: 100%
+  eot_level: false
+  non_blocking: false
   on_transmit:
     then:
+      - logger.log: "CC1101 switching to TX mode"
+      - cc1101.set_idle: rf_transceiver
+      - remote_transmitter.digital_write: false
       - cc1101.begin_tx: rf_transceiver
   on_complete:
     then:
-      - cc1101.begin_rx: rf_transceiver
+      - logger.log: "TX complete"
+      - cc1101.set_idle: rf_transceiver
+      - remote_transmitter.digital_write: true
+      - if:
+          condition:
+            lambda: "return id(rx_active);"
+          then:
+            - cc1101.begin_rx: rf_transceiver
 
-cover:
+number:
   - platform: template
-    id: garage_door
-    name: "Garage Door"
-    device_class: garage
-    has_position: false
-    lambda: "return {};"
-    open_action:
-      - script.execute: script_send_rf
-    close_action:
-      - script.execute: script_send_rf
-    stop_action: []
+    id: cfg_rf_frequency
+    name: "RF Frequency"
+    icon: mdi:sine-wave
+    unit_of_measurement: "MHz"
+    min_value: 300.0
+    max_value: 320.0
+    step: 0.125
+    initial_value: 303.875
+    restore_value: false
+    optimistic: true
+    entity_category: config
+    set_action:
+      - cc1101.set_frequency: !lambda "return x * 1000000.0;"
+      - cc1101.begin_rx: rf_transceiver
+      - logger.log:
+          level: INFO
+          format: "RF frequency set to %.3f MHz"
+          args: ["x"]
+
+select:
+  - platform: template
+    id: cfg_rf_bandwidth
+    name: "RF Bandwidth"
+    icon: mdi:signal-variant
+    entity_category: config
+    options:
+      - "58 kHz"
+      - "101 kHz"
+      - "203 kHz"
+      - "325 kHz"
+      - "812 kHz"
+    initial_option: "203 kHz"
+    optimistic: true
+    set_action:
+      - lambda: |-
+          float bw = 203000;
+          if (x == "58 kHz") bw = 58000;
+          else if (x == "101 kHz") bw = 101000;
+          else if (x == "203 kHz") bw = 203000;
+          else if (x == "325 kHz") bw = 325000;
+          else if (x == "812 kHz") bw = 812000;
+          id(rf_transceiver).set_filter_bandwidth(bw);
+      - cc1101.begin_rx: rf_transceiver
+      - logger.log:
+          level: INFO
+          format: "RF bandwidth set to %s"
+          args: ["x.c_str()"]
+
+globals:
+  - id: sweep_freq
+    type: float
+    initial_value: "300.0"
+  - id: rx_active
+    type: bool
+    initial_value: "false"
 
 script:
   - id: script_send_rf
     mode: single
     then:
-      - logger.log: "Sending garage door RF signal"
-      # Uncomment and paste your captured raw code here:
-      # - remote_transmitter.transmit_raw:
-      #     code: [990, -330, 330, -990, ...]  # <-- your captured code
-      #     repeat:
-      #       times: 5
-      #       wait_time: 5ms
+      - logger.log:
+          level: WARN
+          format: "TX: sending RF code at %.3f MHz"
+          args: ["id(cfg_rf_frequency).state"]
+      - remote_transmitter.transmit_raw:
+          code: !secret garage_door_code
+          repeat:
+            times: 10
+            wait_time: 10ms
+
+  - id: script_freq_sweep
+    mode: single
+    then:
+      - logger.log:
+          level: WARN
+          format: "Starting frequency sweep 300.0 - 310.0 MHz"
+      - globals.set:
+          id: sweep_freq
+          value: "300.0"
+      - while:
+          condition:
+            lambda: "return id(sweep_freq) <= 310.0;"
+          then:
+            - lambda: |-
+                id(rf_transceiver).set_frequency(id(sweep_freq) * 1000000.0);
+                ESP_LOGW("sweep", "TX at %.3f MHz", id(sweep_freq));
+            - script.execute: script_send_rf
+            - script.wait: script_send_rf
+            - cc1101.set_idle: rf_transceiver
+            - delay: 200ms
+            - lambda: "id(sweep_freq) += 0.0625;"
+      - logger.log:
+          level: WARN
+          format: "Frequency sweep complete"
 
 button:
   - platform: template
@@ -103,12 +205,35 @@ button:
       - script.execute: script_send_rf
 
   - platform: template
+    id: btn_freq_sweep
+    name: "Frequency Sweep TX"
+    icon: mdi:tune
+    entity_category: diagnostic
+    on_press:
+      - script.execute: script_freq_sweep
+
+  - platform: template
     id: btn_scan_rf
-    name: "Start RF Scan"
+    name: "Toggle RF Scan"
     icon: mdi:antenna
     entity_category: diagnostic
     on_press:
-      - logger.log:
-          level: INFO
-          format: "RF scan active — press your remote now"
-      - cc1101.begin_rx: rf_transceiver
+      - if:
+          condition:
+            lambda: "return id(rx_active);"
+          then:
+            - cc1101.set_idle: rf_transceiver
+            - globals.set:
+                id: rx_active
+                value: "false"
+            - logger.log:
+                level: WARN
+                format: "RF scan stopped"
+          else:
+            - cc1101.begin_rx: rf_transceiver
+            - globals.set:
+                id: rx_active
+                value: "true"
+            - logger.log:
+                level: WARN
+                format: "RF scan active — press remote now"
