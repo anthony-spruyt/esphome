@@ -3,6 +3,7 @@
   "configs": {
     "repo-operator": {
       "files": [
+        ".devcontainer/.gitignore",
         ".devcontainer/devcontainer.json",
         ".devcontainer/Dockerfile",
         ".devcontainer/initialize.sh",
