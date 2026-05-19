@@ -10,7 +10,7 @@ This repository contains ESPHome device configurations for ESP32-based IoT devic
 
 ### Docker Operations
 
-Start ESPHome dashboard (accessible at http://localhost:6052):
+Start ESPHome dashboard (accessible at [http://localhost:6052](http://localhost:6052)):
 
 ```bash
 docker compose up -d --build
@@ -64,7 +64,7 @@ docker exec esphome esphome upload config/<device-name>.yaml
 
 Device configurations use a hierarchical package-based system with variable substitution:
 
-```
+```text
 config/
 ├── <device-name>.yaml        # Top-level device configs
 ├── secrets.yaml               # Sensitive values (WiFi, API keys, etc.)
@@ -196,7 +196,7 @@ The dashboard provides a web UI for:
 - Viewing logs
 - Editing configurations
 
-Access at http://localhost:6052 when container is running.
+Access at [http://localhost:6052](http://localhost:6052) when container is running.
 
 ## Notes
 
