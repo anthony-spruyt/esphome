@@ -7,7 +7,7 @@ set -euo pipefail
 sudo rm -f /etc/apt/sources.list.d/yarn.list
 
 # Install ESPHome CLI (required by ESPHome VS Code extension)
-pip install esphome
+# pip install esphome
 
 # Fix ownership of ESPHome build cache (created by Docker container as root)
 # so the VS Code ESPHome extension can read/write to it
