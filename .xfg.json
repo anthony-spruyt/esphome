@@ -3,6 +3,10 @@
   "configs": {
     "repo-operator": {
       "files": [
+        ".claude/rules/github.md",
+        ".claude/rules/research.md",
+        ".claude/rules/tdd.md",
+        ".claude/settings.json",
         ".devcontainer/.gitignore",
         ".devcontainer/devcontainer.json",
         ".devcontainer/Dockerfile",
@@ -17,6 +21,7 @@
         ".jsonlintrc",
         ".markdownlint.json",
         ".markdownlintignore",
+        ".mcp.json",
         ".mdformat.toml",
         ".pre-commit-config.yaml",
         ".prettierignore",
