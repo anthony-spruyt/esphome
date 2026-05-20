@@ -28,7 +28,8 @@
         ".prettierrc.yaml",
         ".vscode/settings.json",
         ".yamllint.yml",
-        "LICENSE"
+        "LICENSE",
+        "statusline.sh"
       ]
     }
   }
