@@ -16,20 +16,32 @@
         ".devcontainer/README.md",
         ".devcontainer/setup-devcontainer.sh",
         ".editorconfig",
+        ".github/actionlint.yaml",
         ".github/renovate.json5",
+        ".github/workflows/ci.yaml",
         ".gitignore",
         ".gitleaks.toml",
         ".jsonlintrc",
+        ".lycheeignore",
         ".markdownlint.json",
         ".markdownlintignore",
         ".mcp.json",
         ".mdformat.toml",
+        ".mega-linter-base.yml",
+        ".mega-linter.yml",
+        ".mergify.yml",
         ".pre-commit-config.yaml",
         ".prettierignore",
         ".prettierrc.yaml",
+        ".secretlintignore",
+        ".shellcheckrc",
+        ".trivyignore.yaml",
         ".vscode/settings.json",
         ".yamllint.yml",
-        "LICENSE"
+        "LICENSE",
+        "lint-config.sh",
+        "lint.sh",
+        "trivy-mega-linter.yaml"
       ]
     }
   }
