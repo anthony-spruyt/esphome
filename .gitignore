@@ -1,6 +1,52 @@
+# Dependencies
+node_modules/
+
+# Prevent accidental secret commits
+.env
+.env.*
+*.env
+.secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Claude
+.claude/settings.local.json
+
+# SSH agent
+agent.sock
+
+# MegaLinter
+.output
+
+# Build output
+dist/
+site/
+
+# Coverage
+coverage/
+
+# Temp work directory
+tmp/
+
+# Test temp directories (cleanup in afterEach, but gitignore as safety net)
+test-*-tmp/
+tmp-*-test/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+
+# Worktrees
+.worktrees/
+
 /build/*
 !/build/.createfolder
-config/custom_components/http_request/__pycache__/**
-config/custom_components/powerpal_ble/__pycache__/**
-.claude/settings.local.json
-.env
