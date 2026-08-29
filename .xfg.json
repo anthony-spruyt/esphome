@@ -3,6 +3,8 @@
   "configs": {
     "repo-operator": {
       "files": [
+        ".claude/output-styles/eli5.md",
+        ".claude/rules/comments.md",
         ".claude/rules/github.md",
         ".claude/rules/research.md",
         ".claude/rules/tdd.md",
