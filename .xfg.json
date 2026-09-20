@@ -3,6 +3,7 @@
   "configs": {
     "repo-operator": {
       "files": [
+        ".claude/hookify-plus/warn-comment-density.md",
         ".claude/output-styles/eli5.md",
         ".claude/rules/comments.md",
         ".claude/rules/github.md",
