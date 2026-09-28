@@ -7,7 +7,9 @@ set -euo pipefail
 sudo rm -f /etc/apt/sources.list.d/yarn.list
 
 # Install ESPHome CLI (required by ESPHome VS Code extension)
-# pip install esphome
+pipx install esphome
+# ESPHome's ESP-IDF setup fails without a real uv; the safe-chain shim isn't found by it
+pipx install uv
 
 # Fix ownership of ESPHome build cache (created by Docker container as root)
 # so the VS Code ESPHome extension can read/write to it
