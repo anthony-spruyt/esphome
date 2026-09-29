@@ -9,7 +9,6 @@
         ".claude/rules/comments.md",
         ".claude/rules/github.md",
         ".claude/rules/research.md",
-        ".claude/rules/tdd.md",
         ".claude/settings.json",
         ".devcontainer/.gitignore",
         ".devcontainer/devcontainer.json",
