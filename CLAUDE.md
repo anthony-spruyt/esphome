@@ -4,11 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This repository contains ESPHome device configurations for ESP32-based IoT devices that integrate with Home Assistant. ESPHome runs in a Docker container, and device configurations are organized using a package-based template system to maximize reusability.
+This repository contains ESPHome device configurations for ESP32-based IoT devices that integrate with Home Assistant. The `esphome` CLI is installed in the dev container; the dashboard runs in Docker on the host. Device configurations are organized using a package-based template system to maximize reusability.
 
 ## Development Commands
 
-### Docker Operations
+### Dashboard (run on the host)
+
+`docker` inside the dev container is Podman, not the host's Docker, so run these on the host.
 
 Start ESPHome dashboard (accessible at [http://localhost:6052](http://localhost:6052)):
 
@@ -30,32 +32,19 @@ Rebuild and restart:
 
 ### Linting and Validation
 
-Run pre-commit hooks manually:
-
 ```bash
-pre-commit run --all-files
+pre-commit run --all-files  # hooks from .pre-commit-config.yaml
+./lint.sh                   # full MegaLinter suite, with fixes
+./lint.sh --ci              # MegaLinter, no fixes
 ```
 
-Run yamllint:
+### ESPHome CLI
 
 ```bash
-yamllint -c .yamllint.yml config/
-```
-
-Run prettier:
-
-```bash
-npx prettier --write --config=.prettierrc.yaml --ignore-path=.prettierignore config/
-```
-
-### ESPHome CLI (via Docker)
-
-Since ESPHome runs in a container, execute commands via docker:
-
-```bash
-docker exec esphome esphome compile config/<device-name>.yaml
-docker exec esphome esphome logs config/<device-name>.yaml
-docker exec esphome esphome upload config/<device-name>.yaml
+esphome config config/<device-name>.yaml
+esphome compile config/<device-name>.yaml
+esphome upload config/<device-name>.yaml
+esphome logs config/<device-name>.yaml
 ```
 
 ## Repository Structure
@@ -138,7 +127,7 @@ external_components:
 2. Reference appropriate packages (wifi, board, device template)
 3. Override or extend with device-specific configuration
 4. Add secrets to `config/secrets.yaml` if needed
-5. Compile and test via ESPHome dashboard
+5. Validate with `esphome config`, then compile and upload
 
 ### Modifying Shared Configuration
 
@@ -165,13 +154,7 @@ esp32:
 
 ## Pre-commit Hooks
 
-The repository enforces code quality via pre-commit hooks:
-
-- **yamllint** - YAML syntax and style validation
-- **prettier** - Formatting for YAML, JSON, Markdown
-- **gitleaks** - Secret detection
-- **trailing-whitespace, end-of-file-fixer** - File cleanup
-- **remove-crlf, remove-tabs** - Line ending normalization
+Hooks are defined in `.pre-commit-config.yaml` (yamllint, gitleaks, shellcheck, markdownlint, whitespace and line-ending fixers); `./lint.sh` runs the wider MegaLinter suite.
 
 Hooks run automatically on commit. Bypass only when absolutely necessary:
 
@@ -200,6 +183,7 @@ Access at [http://localhost:6052](http://localhost:6052) when container is runni
 
 ## Notes
 
+- Never read `config/secrets.yaml`. The `Read` deny rule doesn't cover shell commands, so keep `grep -r`, `rg -u` and globs off `config/`. Append new secrets with `>>` without printing them.
 - Device configs are stored in `config/` and mounted to the container's `/config`
 - Build artifacts go to `build/` (mounted as `/build` in container)
 - VSCode extension "ESPHome.esphome-vscode" provides schema validation
