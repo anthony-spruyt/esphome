@@ -10,6 +10,7 @@
         ".claude/rules/github.md",
         ".claude/rules/research.md",
         ".claude/settings.json",
+        ".claude/statusline.sh",
         ".devcontainer/.gitignore",
         ".devcontainer/devcontainer.json",
         ".devcontainer/Dockerfile",
