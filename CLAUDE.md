@@ -79,7 +79,7 @@ packages:
     }
   device:
     !include {
-      file: packages/devices/.luminance.yaml,
+      file: packages/devices/.luminance-and-temp.yaml,
       vars:
         {
           device_name: my-device,
