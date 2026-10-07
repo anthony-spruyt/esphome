@@ -9,17 +9,19 @@ on:
   push:
     branches:
       - "main"
-permissions:
-  actions: "write"
-  contents: "write"
-  pull-requests: "write"
-  security-events: "write"
-  statuses: "write"
+permissions: {}
 jobs:
   lint:
+    permissions:
+      actions: "read"
+      contents: "read"
+      security-events: "write"
     uses: "anthony-spruyt/repo-operator/.github/workflows/_lint.yaml@5cbe1a184d32fd631420e30e20b46a85b5aa244f" # main
   summary:
     needs:
       - "lint"
     if: "always()"
+    permissions:
+      actions: "read"
+      contents: "read"
     uses: "anthony-spruyt/repo-operator/.github/workflows/_summary.yaml@5cbe1a184d32fd631420e30e20b46a85b5aa244f" # main
