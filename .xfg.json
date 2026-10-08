@@ -23,6 +23,7 @@
         ".devcontainer/setup-devcontainer.sh",
         ".editorconfig",
         ".github/actionlint.yaml",
+        ".github/workflows/ci-repo.yaml",
         ".github/workflows/ci.yaml",
         ".gitignore",
         ".gitleaks.toml",
