@@ -23,7 +23,6 @@
         ".devcontainer/setup-devcontainer.sh",
         ".editorconfig",
         ".github/actionlint.yaml",
-        ".github/renovate.json5",
         ".github/workflows/ci.yaml",
         ".gitignore",
         ".gitleaks.toml",
@@ -46,6 +45,8 @@
         ".yamllint.yml",
         "LICENSE",
         "lint.sh",
+        "renovate-overrides.json5",
+        "renovate.json",
         "trivy-mega-linter.yaml"
       ]
     }
