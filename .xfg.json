@@ -8,6 +8,7 @@
         ".claude/hookify-plus/warn-comment-density.md",
         ".claude/hookify-plus/warn-raw-container-run.md",
         ".claude/output-styles/eli5.md",
+        ".claude/pull-default-branch.sh",
         ".claude/rules/comments.md",
         ".claude/rules/github.md",
         ".claude/rules/progress.md",
